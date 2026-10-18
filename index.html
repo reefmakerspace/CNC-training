@@ -124,6 +124,91 @@ p.more{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px
 #infoCard .empty{color:var(--muted);margin:0}
 @media (max-width:480px){.ops{grid-template-columns:minmax(0,1fr)}.slide{grid-template-columns:90px minmax(0,1fr) 56px}}
 @media (prefers-reduced-motion:reduce){svg [data-info]{transition:none}}
+/* photos */
+figure.ph{margin:10px 0 0}
+figure.ph img{display:block;width:100%;max-height:280px;object-fit:cover;border-radius:4px;cursor:zoom-in;background:var(--bg)}
+figure.ph figcaption{font-size:11px;color:var(--muted);margin-top:4px}
+p.lnk{margin:8px 0 0;font-size:13px}p.lnk a{color:var(--fg);font-weight:700}
+p.pinned{font-size:11px;color:var(--muted);margin:8px 0 0}
+.lb{position:fixed;inset:0;z-index:80;background:rgba(1,1,1,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;cursor:zoom-out}
+.lb img{max-width:94vw;max-height:84vh;border-radius:6px}
+.lb .btn{color:#fff;border-color:#fff}
+.staffbar{background:var(--yellow);color:#010101}
+.staffbar .in{max-width:1240px;margin:0 auto;padding:10px 0;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:13px}
+.staffbar .chip{background:#fff;color:#010101;border-color:#010101}
+.staffbar .btn.pri{background:#010101;color:#fff}
+.staffc{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.staffc .sub{width:100%}
+/* Stella, the guide */
+#stella{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:58;font-size:14px}
+.stella-btn{position:relative;display:block;margin-left:auto;width:84px;height:84px;padding:0;border:0;background:none;cursor:pointer}
+.stella-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:50%}
+.star{display:block;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25));transform-origin:50% 70%}
+.star.mini{filter:none}
+.star .lid{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(0);transition:transform .5s ease}
+.star .yawn{opacity:0;transform-box:fill-box;transform-origin:50% 0}
+.star .smile{transition:opacity .3s}
+.star.bored .lid{transform:scaleY(1)}
+.star.bored .smile{opacity:0}
+.star.bored .yawn{opacity:1}
+@media (prefers-reduced-motion:no-preference){
+.star.idle{animation:bob 3.5s ease-in-out infinite}
+.star.wiggle{animation:wig .9s ease-in-out 2}
+.star.jump{transform-origin:50% 54%;animation:jump 1s cubic-bezier(.3,.7,.4,1)}
+.star.bored{animation:droop 4s ease-in-out infinite}
+.star.bored .yawn{animation:yawn 3.2s ease-in-out infinite}
+#stella.bored .zzz i{animation:rise 3s ease-in infinite}
+#stella.bored .zzz i:nth-child(2){animation-delay:1s}
+#stella.bored .zzz i:nth-child(3){animation-delay:2s}
+#stella.bored .zzz b{animation:rise 3.4s ease-in-out infinite .5s}
+#stella.bored .zzz b:nth-of-type(2){animation-delay:2.2s}}
+@keyframes bob{50%{transform:translateY(-4px) rotate(-3deg)}}
+@keyframes wig{25%{transform:rotate(-10deg) translateY(-6px)}75%{transform:rotate(10deg) translateY(-6px)}}
+@keyframes jump{0%{transform:translateY(0) rotate(0) scale(1,1)}14%{transform:translateY(0) rotate(0) scale(1.12,.84)}50%{transform:translateY(-70px) rotate(200deg) scale(.96,1.04)}82%{transform:translateY(0) rotate(360deg) scale(1.1,.88)}100%{transform:translateY(0) rotate(360deg) scale(1,1)}}
+@keyframes droop{0%,100%{transform:rotate(-7deg) translateY(3px)}50%{transform:rotate(5deg) translateY(5px)}}
+@keyframes yawn{0%,100%{transform:scaleY(.35)}35%,60%{transform:scaleY(1.15)}}
+@keyframes rise{0%{transform:translate(0,0);opacity:0}15%{opacity:1}100%{transform:translate(-8px,-56px);opacity:0}}
+.zzz{position:absolute;right:54px;top:-6px;width:40px;height:60px;pointer-events:none;opacity:0;transition:opacity .4s}
+#stella.bored .zzz{opacity:1}
+.zzz i{position:absolute;bottom:0;border:2px solid var(--aqua);border-radius:50%;opacity:0}
+.zzz i:nth-child(1){width:10px;height:10px;left:18px}.zzz i:nth-child(2){width:7px;height:7px;left:6px}.zzz i:nth-child(3){width:12px;height:12px;left:26px}
+.zzz b{position:absolute;bottom:0;font-family:var(--f-display);color:var(--blue);opacity:0}
+.zzz b:nth-of-type(1){left:4px;font-size:13px}.zzz b:nth-of-type(2){left:22px;font-size:17px}
+.hello{position:absolute;right:92px;bottom:20px;width:max-content;max-width:min(260px,calc(100vw - 120px));background:var(--yellow);color:#010101;border-radius:16px 16px 4px 16px;padding:10px 14px;box-shadow:0 8px 22px rgba(0,0,0,.2);font-weight:700;line-height:1.35}
+.hello .row{margin-top:8px;gap:6px}
+.hello button{font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:5px 12px;cursor:pointer;border:1px solid #010101;background:#010101;color:#fff}
+.hello button+button{background:transparent;color:#010101}
+.spanel{position:absolute;right:0;bottom:96px;width:min(360px,calc(100vw - 32px));max-height:min(72vh,580px);display:flex;flex-direction:column;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 36px rgba(0,0,0,.28);overflow:hidden}
+.shead{display:flex;align-items:center;gap:8px;background:var(--reef-dark);color:#fff;padding:8px 10px}
+.shead span{font-size:12px;opacity:.8}
+.shead button{background:none;border:0;color:#fff;font-size:22px;line-height:1;cursor:pointer;padding:2px 6px}
+.msgs{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:120px}
+.msg{max-width:88%;padding:8px 11px;line-height:1.4}
+.msg.s{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:12px 12px 12px 3px}
+.msg.u{align-self:flex-end;background:var(--fg);color:var(--bg);border-radius:12px 12px 3px 12px}
+.msg ol,.msg ul{margin:6px 0 0;padding-left:18px}.msg p{margin:0 0 6px}
+.opts{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border-top:1px solid var(--line)}
+.opts .chip{font-size:13px}
+.opts .chip.go{background:var(--yellow);color:#010101;border-color:var(--yellow);font-weight:700}
+.pulse{animation:hpulse .9s ease-in-out infinite alternate;border-radius:6px}
+@keyframes hpulse{from{box-shadow:0 0 0 2px #FCC424}to{box-shadow:0 0 0 7px rgba(252,196,36,.45)}}
+svg .pulse{animation:spulse .9s ease-in-out infinite alternate}
+@keyframes spulse{from{filter:drop-shadow(0 0 2px #FCC424)}to{filter:drop-shadow(0 0 9px #FCC424) drop-shadow(0 0 3px #B71F34)}}
+@media (prefers-reduced-motion:reduce){.pulse,svg .pulse{animation:none;box-shadow:0 0 0 4px #FCC424}}
+.shead .sreset{margin-left:auto;font:inherit;font-size:12px;font-weight:700;color:#fff;background:transparent;border:1px solid #6A6566;border-radius:999px;padding:3px 10px;cursor:pointer}
+.shead .sreset:hover{border-color:#fff}
+.shead .sreset+button{margin-left:4px}
+.spanel.dockL{position:fixed;right:auto;left:max(16px,env(safe-area-inset-left,0px));bottom:16px}
+.spot-ring{position:fixed;z-index:57;pointer-events:none;border:4px solid #FCC424;border-radius:10px;box-shadow:0 0 0 2px #010101,0 0 22px 6px rgba(252,196,36,.75)}
+.spot-tag{position:absolute;left:50%;top:-34px;transform:translateX(-50%);background:#FCC424;color:#010101;font-weight:700;font-size:13px;padding:3px 10px;border-radius:999px;box-shadow:0 0 0 2px #010101;white-space:nowrap}
+.spot-ring.below .spot-tag{top:auto;bottom:-34px}
+@media (prefers-reduced-motion:no-preference){.spot-ring{animation:ringp .9s ease-in-out infinite alternate}}
+@keyframes ringp{from{box-shadow:0 0 0 2px #010101,0 0 8px 2px rgba(252,196,36,.5)}to{box-shadow:0 0 0 2px #010101,0 0 26px 10px rgba(252,196,36,.85)}}
+@media print{#stella,.tip,.spot-ring{display:none!important}}
+.secbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.secbar .btn{padding:7px 12px;font-size:14px}
+.secprog{flex:1;min-width:80px}
+p.seccap{min-height:2.9em;font-size:14px;color:var(--fg)}
 /* level gating */
 body[data-mode="1"] [data-min="2"],body[data-mode="1"] [data-min="3"],body[data-mode="2"] [data-min="3"]{display:none!important}
 </style></head><body data-mode="1">
@@ -152,6 +237,7 @@ body[data-mode="1"] [data-min="2"],body[data-mode="1"] [data-min="3"],body[data-
   <span class="dims" id="hint">Hover anything highlighted to learn about it · tap on touch screens</span>
 </div>
 
+<div id="staffBar" class="staffbar gut" hidden></div>
 <main class="gut">
   <div class="stagewrap">
     <div class="stage" id="stage"><p class="note">Starting… If this message stays, open this file in Chrome, Edge, or Safari.</p></div>
@@ -164,6 +250,7 @@ body[data-mode="1"] [data-min="2"],body[data-mode="1"] [data-min="3"],body[data-
   <div class="panel" id="rail"></div>
 </main>
 <div class="tip" id="tip" hidden></div>
+<script type="application/json" id="photoData">{}</script>
 <script>
 /* ================= EDITABLE DATA =================
    Machine limits, materials and starting-point numbers live here so REEF staff can tune them.
@@ -399,6 +486,29 @@ var I = {
   fs_dir: { t: `Feed direction`, b: `The direction the tool is travelling.`, i: `Climb milling: the cutter rotation and travel go the same way at the cut. Conventional: opposite.` },
   fs_top: { t: `Top view of engagement`, b: `Seen from above: the shaded area is the part of the tool that’s cutting.` }
 };
+
+/* ================= PHOTOS =================
+   Items that get a photo slot. Photos are added by REEF staff in "staff photo mode"
+   (open the file with ?staff at the end of the address, or press Ctrl+Alt+Shift+P),
+   then "Save HTML with photos" downloads a new self-contained file. */
+var PHOTO_KEYS = {
+  so_spindle: `VFD spindle on the Z carriage`, so_collet: `ER-16 collet, nut and the two wrenches`,
+  so_bitsetter: `BitSetter at the front-left of the bed`, so_bitzero: `BitZero on a stock corner, clip on the collet`,
+  so_waste: `Spoilboard with stock screwed down in waste areas`, so_dust: `Dust boot with brush skirt and hose`,
+  ca_qtc: `Quick-change lever open, tool going in`, ca_collet: `Endmill with a bit collar installed`,
+  ca_tls: `Tool length sensor on the bed`, ca_probe: `Probe touching a stock edge`, ca_bed: `Stock clamped on the worktable`,
+  em_flat: `Flat endmill close-up`, em_ball: `Ball endmill close-up`, em_taper: `V-bit / tapered endmill close-up`,
+  em_helix: `Upcut and downcut endmills side by side`
+};
+// Official manufacturer pages (open in a new tab; needs internet).
+var LINKS = {
+  so_frame: [`Carbide 3D: Shapeoko 5 Pro specs`, `https://carbide3d.com/shapeoko/shapeoko5pro-specs/`],
+  so_spindle: [`Carbide 3D: 65 mm VFD spindle kit`, `https://shop.carbide3d.com/products/vfd-spindle-kit`],
+  so_bitsetter: [`Carbide 3D: BitSetter`, `https://shop.carbide3d.com/products/bitsetter`],
+  ca_enc: [`Makera: Carvera Air`, `https://eu.makera.com/products/carvera-air`],
+  ca_spindle: [`Makera: Carvera Air`, `https://eu.makera.com/products/carvera-air`],
+  ca_collet: [`Makera: bit collars`, `https://makera.com/products/bits-collar`]
+};
 </script>
 <script>
 window.addEventListener("error", function (e) {
@@ -409,6 +519,7 @@ window.addEventListener("error", function (e) {
 <script>
 (function () {
 "use strict";
+var INITIAL = document.documentElement.outerHTML;
 /* ---------------- state ---------------- */
 var LS = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
            set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -431,8 +542,10 @@ function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 function r2(v) { return Math.round(v * 100) / 100; }
 function frac(mm) { var m = { 1.5875: `1/16″`, 3.175: `1/8″`, 6.35: `1/4″`, 12.7: `1/2″` }; return m[mm] || r2(mm) + " mm"; }
 
-/* ---------------- hover info ---------------- */
-function infoHTML(key, extra) {
+/* ---------------- hover info + photos ---------------- */
+var PHOTOS = {}; try { PHOTOS = JSON.parse(document.getElementById("photoData").textContent || "{}"); } catch (e) { PHOTOS = {}; }
+var STAFF = /(^|[?&#])staff\b/.test((location.search + location.hash).replace(/^[?#]/, ""));
+function infoHTML(key, extra, forCard) {
   var d = I[key]; if (!d) return "";
   var h = "<h4>" + d.t + (d.tag ? '<span class="tag">' + d.tag + "</span>" : "") + "</h4>";
   var parts = [d.b, S.mode >= 2 ? d.i : null, S.mode >= 3 ? d.e : null].filter(Boolean);
@@ -441,18 +554,25 @@ function infoHTML(key, extra) {
   if (extra) h += '<p class="now">' + extra + "</p>";
   var more = S.mode === 1 ? (d.i || d.e) : S.mode === 2 ? d.e : null;
   if (more) h += '<p class="more">' + hex(MODES[S.mode + 1].c, 12) + " More detail in " + MODES[S.mode + 1].n + " mode</p>";
+  if (forCard) {
+    if (PHOTOS[key]) h += '<figure class="ph"><img src="' + PHOTOS[key] + '" alt="Photo: ' + d.t.replace(/"/g, "") + '" data-zoom><figcaption>REEF photo · click to enlarge</figcaption></figure>';
+    if (LINKS[key]) h += '<p class="lnk"><a href="' + LINKS[key][1] + '" target="_blank" rel="noopener">' + LINKS[key][0] + " ↗</a></p>";
+    if (STAFF && PHOTO_KEYS[key]) h += '<div class="staffc"><span class="sub">Suggested shot: ' + PHOTO_KEYS[key] + '</span><label class="btn sec">' + (PHOTOS[key] ? "Replace photo" : "Add photo") + '<input type="file" accept="image/*" data-photo="' + key + '" hidden></label>' + (PHOTOS[key] ? '<button type="button" class="btn sec" data-unphoto="' + key + '">Remove</button>' : "") + "</div>";
+  } else if (PHOTOS[key]) h += '<p class="more">Photo available · click to pin it in the Info panel</p>';
   return h;
 }
-var curEl = null;
-function showCard(el) {
-  document.querySelectorAll("svg .on").forEach(function (n) { n.classList.remove("on"); });
-  card.innerHTML = infoHTML(el.getAttribute("data-info"), el.getAttribute("data-extra"));
+var curEl = null, PIN = null;
+function showCard(el, pin) {
+  var key = el.getAttribute("data-info");
+  if (pin) { document.querySelectorAll("svg .on").forEach(function (n) { n.classList.remove("on"); }); el.classList.add("on"); PIN = key; }
+  card.innerHTML = infoHTML(key, el.getAttribute("data-extra"), true) + (PIN === key ? '<p class="pinned">Pinned · click an empty spot to unpin</p>' : "");
 }
+function cardKey(key) { PIN = key; card.innerHTML = infoHTML(key, null, true); }
 document.addEventListener("pointermove", function (e) {
   if (e.pointerType === "touch") return;
   var el = e.target && e.target.closest ? e.target.closest("[data-info]") : null;
-  if (!el) { tip.hidden = true; curEl = null; return; }
-  if (el !== curEl) { curEl = el; tip.innerHTML = infoHTML(el.getAttribute("data-info"), el.getAttribute("data-extra")); showCard(el); }
+  if (!el || e.target.closest("#infoCard")) { tip.hidden = true; curEl = null; return; }
+  if (el !== curEl) { curEl = el; tip.innerHTML = infoHTML(el.getAttribute("data-info"), el.getAttribute("data-extra")); if (!PIN && !STAFF) showCard(el); }
   tip.hidden = false;
   var w = tip.offsetWidth, h = tip.offsetHeight, x = e.clientX + 16, y = e.clientY + 16;
   if (x + w > window.innerWidth - 8) x = e.clientX - w - 12;
@@ -460,11 +580,19 @@ document.addEventListener("pointermove", function (e) {
   tip.style.left = Math.max(8, x) + "px"; tip.style.top = Math.max(8, y) + "px";
 });
 document.addEventListener("click", function (e) {
-  var el = e.target.closest && e.target.closest("[data-info]");
-  if (el && !e.target.closest("button,input,label")) { showCard(el); el.classList.add("on"); }
+  if (!e.target.closest) return;
+  if (e.target.closest("#infoCard,#stella,.lb,#staffBar,.mode")) return;
+  var el = e.target.closest("[data-info]");
+  if (el && !e.target.closest("button,input,label")) showCard(el, true);
+  else if (!el && !e.target.closest("button,input,label,a")) { PIN = null; document.querySelectorAll("svg .on").forEach(function (n) { n.classList.remove("on"); }); var pn = card.querySelector(".pinned"); if (pn) pn.remove(); }
 });
-document.addEventListener("focusin", function (e) { var el = e.target.closest && e.target.closest("[data-info]"); if (el) showCard(el); });
+document.addEventListener("focusin", function (e) { var el = e.target.closest && e.target.closest("[data-info]"); if (el && !PIN && !STAFF) showCard(el); });
 window.addEventListener("scroll", function () { tip.hidden = true; curEl = null; }, { passive: true });
+/* photo lightbox */
+document.addEventListener("click", function (e) {
+  var z = e.target.closest && e.target.closest("[data-zoom]");
+  if (z) { var lb = document.createElement("div"); lb.className = "lb"; lb.innerHTML = '<img src="' + z.src + '" alt="' + z.alt + '"><button type="button" class="btn sec" aria-label="Close">Close</button>'; lb.onclick = function () { lb.remove(); }; document.body.appendChild(lb); return; }
+});
 
 /* ---------------- mode picker ---------------- */
 var modeBtn = $("modeBtn"), modeMenu = $("modeMenu");
@@ -909,8 +1037,186 @@ function play() {
   if (A.i >= CUR.flat.length - 1) { A.d = 0; A.i = 0; A.trail = []; }
   A.on = true; A.t0 = 0; b.textContent = "❚❚ Pause"; A.raf = requestAnimationFrame(animStep);
 }
+/* ============ SIDE VIEW "HOW IT CUTS" ANIMATION ============
+   A slice through the part (left = X0). Material is a height map; the tool removes what it touches.
+   Each operation is a list of moves {x, z, t (seconds), cap (caption), hide (travelling out of the slice)}. */
+var NS = 481, DXS = 0.25, SAFE = -3;
+var SA = { on: false, raf: 0, t0: 0, i: 0, tt: 0, x: 0, z: SAFE, px: 0, pz: SAFE, d: null, plan: null, sp: 1, cap: "" };
+function SXs(x) { return 30 + x * 4.5; } function SZs(z) { return 60 + z * 4; }
+function toolOff(t, dx) {
+  var R = t.D / 2; if (Math.abs(dx) > R + 1e-9) return null;
+  if (t.t === "ball") return R - Math.sqrt(Math.max(0, R * R - dx * dx));
+  if (t.t === "v") return Math.abs(dx) / Math.tan(t.incl / 2 * Math.PI / 180);
+  return 0;
+}
+function domeSurf(x) { if (x < 56 || x > 88) return 0; return Math.abs(x - 72) <= 14 ? 6 * Math.pow((x - 72) / 14, 2) : 6; }
+function secPlan(opk) {
+  var op = OPS[opk], t = op.tool, D = t.D, R = D / 2, ds = S.stepdown, so = Math.max(0.3, S.stepover / 100 * D), mv = [], pre = null, sum = "", fus = S.sw === "f";
+  function m(x, z, tm, cap, hide) { mv.push({ x: x, z: z, t: tm, cap: cap, hide: !!hide }); }
+  if (opk === "contour" || opk === "contour2d") {
+    var xl = 10 - R, xr = 110 + R, n = Math.ceil(12.3 / ds);
+    m(xl, SAFE, 0.7, "Rapid to the start, safely above the stock.");
+    for (var k = 1; k <= n; k++) {
+      var z = 12.3 * k / n, last = k === n, zl = last && S.tabs ? 9.3 : z;
+      m(xl, zl, 1.1, "Pass " + k + " of " + n + (k === 1 ? " — the tool " + (fus ? "leads in" : "ramps in") + " and cuts " : " — down another ") + r2(12.3 / n) + " mm, following the outline." + (last && S.tabs ? " <b>Final pass:</b> here it lifts over a <b>tab</b>, leaving a bridge that holds the part." : ""));
+      m(xr, z, 1.2, "…travelling all the way around the outline (into the screen)…", true);
+      m(xr, z, 0.6, "…and back past the other side of the part.");
+      if (!last) m(xl, 12.3 * (k + 1) / n - 12.3 / n, 1.0, "…around again to where it started, ready to step down.", true);
+    }
+    m(xr, SAFE, 0.6, S.tabs ? "Done — the part is cut free except for the tabs. 0.3 mm into the spoilboard makes a clean release." : "Done — the part is cut free. Without tabs it can shift on the last pass — use tabs or screws!");
+    sum = n + " passes × " + r2(12.3 / n) + " mm";
+  } else if (opk === "pocket" || opk === "pocket2d") {
+    var c = 32, n2 = Math.ceil(4 / ds);
+    m(c, SAFE, 0.6, "Rapid to the middle of the pocket.");
+    for (var k2 = 1; k2 <= n2; k2++) {
+      var z2 = 4 * k2 / n2;
+      m(c, z2, 1.0, "Pass " + k2 + " of " + n2 + ": " + (fus ? "helix" : "ramp") + " down to " + r2(z2) + " mm.");
+      m(14 + R, z2, 1.4, "Clearing outward, ring by ring — each ring overlaps the last by the stepover (" + S.stepover + "% of the tool).");
+      m(50 - R, z2, 0.8, "…around the ring to the other wall…", true);
+      m(c, z2, 1.2, "…finishing this layer.");
+    }
+    m(c, SAFE, 0.5, "Done — a flat floor 4 mm deep. Inside corners are rounded to the tool radius.");
+    sum = n2 + " passes × " + r2(4 / n2) + " mm";
+  } else if (opk === "adaptive") {
+    m(32, SAFE, 0.6, "Adaptive clearing starts in the middle.");
+    m(32, 4, 1.4, "It helixes down to the <b>full 4 mm depth in one go</b>…");
+    var x = 32;
+    while (x - 0.55 > 14 + R) { m(x - 0.55, 4, 0.14, "…then shaves thin slices. Only ~10–15% of the tool’s side cuts at once, so the load stays steady."); m(x - 0.35, 4, 0.08); x -= 0.55; }
+    m(32, 4, 0.8, "…loops back around…", true);
+    x = 32;
+    while (x + 0.55 < 50 - R) { m(x + 0.55, 4, 0.14, "Same idea on this side: deep and narrow beats shallow and wide on small machines."); m(x + 0.35, 4, 0.08); x += 0.55; }
+    m(x, SAFE, 0.5, "Done in a single depth — faster and easier on the tool. A finishing pass would clean up the walls.");
+    sum = "1 deep pass · narrow slices";
+  } else if (opk === "vcarve") {
+    m(68.8, SAFE, 0.6, "V-Carve: the bit follows the middle of the shape.");
+    m(68.8, 0, 0.5, "It touches down where the shape is a thin point…");
+    m(72, 3.1, 1.8, "…goes <b>deeper where the shape gets wider</b>, so the V opens up to the shape’s edges…");
+    m(75.2, 0, 1.8, "…and climbs back out as the shape narrows again. (A 1/4″ 90° bit can reach 3.2 mm deep; wider areas need a bigger bit or a flat-bottom clearing pass.)");
+    m(75.2, SAFE, 0.5, "Done — sharp corners come out crisp because the V point reaches into them.");
+    sum = "depth = half the shape’s width (90° bit)";
+  } else if (opk === "drill") {
+    m(99, SAFE, 0.6, "Drill: move over the hole.");
+    [4, 8, 12.3].forEach(function (dd, i) { m(99, dd, 1.0, "Peck " + (i + 1) + ": plunge to " + dd + " mm (slowly — plunge rate)."); m(99, -0.5, 0.5, "…pull up to clear the chips."); });
+    m(99, SAFE, 0.4, "Done — a hole the size of the tool. Bigger holes need Contour (Inside) or Pocket.");
+    sum = "3 pecks";
+  } else if (opk === "bore") {
+    var rr2 = (6.35 - D) / 2;
+    m(99, SAFE, 0.5, "Bore: move over the hole’s center.");
+    m(99 - rr2, 0, 0.4, "The tool moves in a circle while going down — a <b>helix</b>…");
+    for (var zz = 0.5; zz < 12.3; zz += 1) { m(99 + rr2, zz, 0.22); m(99 - rr2, Math.min(12.3, zz + 0.5), 0.22); }
+    m(99 + rr2, 12.3, 0.3, "…then a full circle at the bottom cleans up the wall.");
+    m(99 - rr2, 12.3, 0.3); m(99, 12.3, 0.2); m(99, SAFE, 0.5, "Done — a 1/4″ hole from a 1/8″ tool.");
+    sum = "helix · 1 mm per turn";
+  } else if (opk === "face") {
+    m(-4, SAFE, 0.5, "Face: start just off the edge of the stock.");
+    m(-4, 0.5, 0.4, "Drop to a shallow 0.5 mm depth…");
+    for (var row = 0; row < 3; row++) {
+      var xa = row % 2 ? 124 : -4, xb = row % 2 ? -4 : 124;
+      if (row) m(xa, 0.5, 0.6, "…step over to the next row (" + S.stepover + "% of the tool) and go back.", true);
+      m(xb, 0.5, 2.2, row ? "Each row overlaps the last so no ridges are left." : "…and skim straight across the top.");
+    }
+    m(xb, SAFE, 0.5, "Done — a flat, clean top surface. Now Z0 is trustworthy.");
+    sum = "1 shallow pass · 0.5 mm";
+  } else if (opk === "chamfer") {
+    pre = function (d) { for (var i = 0; i < NS; i++) { var xx = i * DXS; if (xx < 10 || xx > 110) d[i] = 12.3; } };
+    m(10, SAFE, 0.6, "2D Chamfer runs after the part is cut out.");
+    m(10, 1.2, 0.8, "The V-bit’s tip runs just past the edge, so its <b>side</b> cuts a 45° bevel.");
+    m(110, 1.2, 1.2, "…all the way around the part…", true);
+    m(110, 1.2, 0.6, "…bevelling the far edge too.");
+    m(110, SAFE, 0.5, "Done — no sharp edges, and it looks finished.");
+    sum = "1 pass · 1.2 mm bevel";
+  } else if (opk === "parallel") {
+    pre = function (d) { for (var i = 0; i < NS; i++) { var xx = i * DXS; if (xx >= 56 && xx <= 88) d[i] = Math.max(0, Math.floor(domeSurf(xx) - 0.35)); } };
+    var tip = function (x) { var best = 99; for (var dx = -R; dx <= R + 1e-9; dx += 0.1) { var sx = x + dx, s = sx < 56 || sx > 88 ? 0 : domeSurf(sx); best = Math.min(best, s + toolOff(t, dx)); } return best; };
+    m(55.5, SAFE, 0.6, "3D Parallel: roughing (with a flat endmill) left <b>stair-steps</b>.");
+    var first = true;
+    for (var px = 55.5; px <= 88.5; px += 0.5) { m(px, tip(px), first ? 0.4 : 0.07, first ? "The ball endmill follows the curved surface and smooths the steps away." : undefined); first = false; }
+    m(88.5, tip(88.5), 0.6, "…step over a little (into the screen)…", true);
+    for (px = 88.5; px >= 55.5; px -= 0.5) m(px, tip(px), px === 88.5 ? 0.3 : 0.07, px === 88.5 ? "…and come back on the next line. Each line leaves a tiny ridge (a scallop)." : undefined);
+    m(55.5, SAFE, 0.5, "Done. Smaller stepover = smaller scallops, but a longer job.");
+    sum = "follows the 3D surface";
+  }
+  return { mv: mv, pre: pre, sum: sum };
+}
+function secToolShape(t) {
+  var w = t.D * 4.5, R = w / 2;
+  if (t.t === "v") { var h = R / Math.tan(t.incl / 2 * Math.PI / 180) * (4 / 4.5); return '<polygon points="' + (-R) + "," + (-h) + " " + R + "," + (-h) + ' 0,0" fill="#9AA0A6" stroke="#424143"/><rect x="' + (-R) + '" y="-140" width="' + w + '" height="' + (140 - h) + '" fill="#C9CDD1" stroke="#424143"/>'; }
+  if (t.t === "ball") return '<path d="M' + (-R) + " -140 V" + (-R * 4 / 4.5) + " A" + R + " " + (R * 4 / 4.5) + " 0 0 0 " + R + " " + (-R * 4 / 4.5) + ' V-140 Z" fill="#9AA0A6" stroke="#424143"/>';
+  return '<rect x="' + (-R) + '" y="-140" width="' + w + '" height="140" fill="#9AA0A6" stroke="#424143"/><path d="M' + (-R) + " -12 l" + w + " -6 M" + (-R) + " -26 l" + w + ' -6" stroke="#424143" stroke-opacity=".5" stroke-width="3"/>';
+}
+function secBox() {
+  var op = OPS[S.op];
+  return '<svg class="sec" viewBox="0 0 600 140" role="img" aria-label="Side view animation of the cut">' +
+    '<g data-info="sec_spoil"><polygon id="secSpoil" fill="#CDB892" stroke="#8A6A3E"/></g>' +
+    '<g data-info="sec_stock"><polygon id="secMat" fill="#E8C99A" stroke="#8A6A3E"/></g>' +
+    '<g id="secTool" data-info="tp_tool">' + secToolShape(op.tool) + "</g>" +
+    '<text id="secZ" x="30" y="16" text-anchor="start" style="font-family:var(--f-mono);font-size:12px;fill:var(--muted)"></text></svg>' +
+    '<div class="secbar"><button type="button" class="btn pri" id="secPlay">▶ Play</button><button type="button" class="btn sec" id="secReset">↺ Reset</button>' +
+    '<div class="seg" role="group" aria-label="Animation speed" id="secSpeed"><button type="button" data-sp="0.5" aria-pressed="false">Slow</button><button type="button" data-sp="1" aria-pressed="true">Normal</button><button type="button" data-sp="2.5" aria-pressed="false">Fast</button></div>' +
+    '<div class="prog secprog" aria-hidden="true"><i id="secProg"></i></div></div><p class="note seccap" id="secCap" aria-live="polite"></p>';
+}
+function secDraw() {
+  var d = SA.d, top = [], sp = [];
+  for (var i = 0; i < NS; i += 2) top.push(r2(SXs(i * DXS)) + "," + r2(SZs(Math.min(12, d[i]))));
+  top.push(r2(SXs(120)) + "," + r2(SZs(Math.min(12, d[NS - 1]))));
+  $("secMat").setAttribute("points", top.join(" ") + " " + SXs(120) + "," + SZs(12) + " " + SXs(0) + "," + SZs(12));
+  sp.push("10," + SZs(12));
+  for (i = 0; i < NS; i += 2) sp.push(r2(SXs(i * DXS)) + "," + r2(SZs(Math.max(12, d[i]))));
+  sp.push("590," + SZs(12), "590," + SZs(17.5), "10," + SZs(17.5));
+  $("secSpoil").setAttribute("points", sp.join(" "));
+  var tl = $("secTool"), mv = SA.plan.mv[SA.i];
+  tl.setAttribute("transform", "translate(" + r2(SXs(SA.x)) + "," + r2(SZs(SA.z)) + ")");
+  tl.style.opacity = SA.on && mv && mv.hide ? 0.25 : 1;
+  $("secZ").textContent = "Z " + (SA.z <= 0 ? "+" + r2(-SA.z) : "−" + r2(SA.z)) + " mm";
+  var tot = 0, done = 0; SA.plan.mv.forEach(function (m, k) { tot += m.t; if (k < SA.i) done += m.t; });
+  $("secProg").style.width = (tot ? Math.min(100, (done + SA.tt) / tot * 100) : 0) + "%";
+  $("secCap").innerHTML = SA.cap;
+}
+function secCarve(x, z) {
+  var t = OPS[S.op].tool, R = t.D / 2, i0 = Math.max(0, Math.ceil((x - R) / DXS)), i1 = Math.min(NS - 1, Math.floor((x + R) / DXS));
+  for (var i = i0; i <= i1; i++) { var o = toolOff(t, i * DXS - x); if (o == null) continue; var b = z - o; if (b > SA.d[i]) SA.d[i] = Math.min(b, 12.6); }
+}
+function secReset() {
+  cancelAnimationFrame(SA.raf); SA.on = false;
+  SA.plan = secPlan(S.op); SA.d = new Float32Array(NS); if (SA.plan.pre) SA.plan.pre(SA.d);
+  var f = SA.plan.mv[0]; SA.x = SA.px = f.x; SA.z = SA.pz = SAFE; SA.i = 0; SA.tt = 0;
+  SA.cap = "Press <b>▶ Play</b> to watch how " + OPS[S.op].n + " cuts, step by step. <span class=\"dims\">(" + SA.plan.sum + ")</span>";
+  var b = $("secPlay"); if (b) b.textContent = "▶ Play";
+  if ($("secMat")) secDraw();
+}
+function secStep(ts) {
+  if (!SA.on) return;
+  if (!$("secMat")) { SA.on = false; return; }
+  var dt = Math.min(0.05, (ts - (SA.t0 || ts)) / 1000) * SA.sp; SA.t0 = ts;
+  var mvs = SA.plan.mv;
+  while (dt > 0 && SA.i < mvs.length) {
+    var m = mvs[SA.i]; if (m.cap) SA.cap = m.cap;
+    var left = m.t - SA.tt, use = Math.min(dt, left); SA.tt += use; dt -= use;
+    var f = m.t ? SA.tt / m.t : 1, nx = SA.px + (m.x - SA.px) * f, nz = SA.pz + (m.z - SA.pz) * f;
+    if (!m.hide) { var steps = Math.max(1, Math.ceil(Math.hypot(nx - SA.x, nz - SA.z) / 0.15)); for (var s = 1; s <= steps; s++) secCarve(SA.x + (nx - SA.x) * s / steps, SA.z + (nz - SA.z) * s / steps); }
+    SA.x = nx; SA.z = nz;
+    if (SA.tt >= m.t - 1e-9) { SA.px = m.x; SA.pz = m.z; SA.i++; SA.tt = 0; }
+  }
+  secDraw();
+  if (SA.i >= mvs.length) { SA.on = false; $("secPlay").textContent = "↺ Replay"; SA.tt = 0; secDraw(); return; }
+  SA.raf = requestAnimationFrame(secStep);
+}
+function secPlayPause() {
+  var b = $("secPlay");
+  if (SA.on) { SA.on = false; cancelAnimationFrame(SA.raf); b.textContent = "▶ Play"; return; }
+  if (SA.i >= SA.plan.mv.length) secReset();
+  SA.on = true; SA.t0 = 0; b.textContent = "❚❚ Pause"; SA.raf = requestAnimationFrame(secStep);
+}
+function secInit() {
+  if (!$("secPlay")) return;
+  $("secPlay").onclick = secPlayPause;
+  $("secReset").onclick = secReset;
+  $("secSpeed").onclick = function (e) { var b = e.target.closest("[data-sp]"); if (!b) return; SA.sp = +b.getAttribute("data-sp"); this.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); };
+  $("secSpeed").querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", +x.getAttribute("data-sp") === SA.sp); });
+  secReset();
+}
 var paths = {
-  stage: function () { animReset(); return "<h3>Top view · " + (S.sw === "cc" ? "Carbide Create" : "Fusion 360") + " · " + OPS[S.op].n + "</h3>" + topSVG() + "<h3>Side section (schematic)</h3>" + secSVG(); },
+  stage: function () { animReset(); return "<h3>Top view · " + (S.sw === "cc" ? "Carbide Create" : "Fusion 360") + " · " + OPS[S.op].n + "</h3>" + topSVG() + "<h3>Side view · how it cuts</h3>" + secBox(); },
   legend: function () {
     return '<span data-info="tp_cut"><i class="sw" style="border-color:#B71F34"></i>Cut</span><span data-info="tp_rapid"><i class="sw dash" style="border-color:#05A7E0"></i>Rapid</span>' +
       '<span data-info="tp_ramp"><i class="sw dash" style="border-color:#F15B29"></i>Ramp / plunge</span><span data-info="tp_lead" data-min="2"><i class="sw" style="border-color:#7A7F84"></i>Lead in/out</span>' +
@@ -931,10 +1237,11 @@ var paths = {
       (op.use.indexOf("tabs") >= 0 ? '<label class="chk"><input type="checkbox" data-set="tabs"' + (S.tabs ? " checked" : "") + '> <span class="term" data-info="tp_tab">Tabs</span> (hold the part on through-cuts)</label>' : "") +
       (!op.use.length ? '<p class="note">' + (S.op === "adaptive" ? "Adaptive uses optimal load instead of stepover, and one deep stepdown." : "No adjustable settings for this demo.") + "</p>" : "") +
       '<div data-min="3"><div class="sub" style="margin-bottom:6px">Direction</div>' + seg("climb", [[true, "Climb"], [false, "Conventional"]]) + "</div></section>" +
-      '<section class="grp" style="--c:var(--aqua)"><h2 class="lbl">Watch it run</h2><div class="row"><button type="button" class="btn pri" id="playBtn">▶ Play</button>' +
+      '<section class="grp" style="--c:var(--aqua)"><h2 class="lbl">Watch the top view</h2><div class="row"><button type="button" class="btn pri" id="playBtn">▶ Play</button>' +
       '<button type="button" class="btn sec" id="rstBtn">Restart</button></div><div class="row"><span class="sub">Speed</span>' + seg("speed", [[1, "1×"], [3, "3×"], [10, "10×"]]) + "</div></section>";
   },
   after: function () {
+    secInit();
     $("playBtn").onclick = play;
     $("rstBtn").onclick = function () { animReset(); var mk = $("toolMk"); mk.setAttribute("cx", X(HOME[0])); mk.setAttribute("cy", Y(HOME[1])); $("trail").setAttribute("points", ""); play(); };
   }
@@ -1115,7 +1422,7 @@ var flow = {
 var VIEWS = { machines: machines, tools: tools, paths: paths, feeds: feeds, flow: flow };
 function renderStage() {
   var v = VIEWS[S.tab];
-  if (S.tab === "paths") { animReset(); stage.innerHTML = paths.stage(); }
+  if (S.tab === "paths") { animReset(); stage.innerHTML = paths.stage(); secInit(); }
   else stage.innerHTML = v.stage();
 }
 function render() {
@@ -1125,9 +1432,253 @@ function render() {
   stage.innerHTML = v.stage(); legend.innerHTML = v.legend(); rail.innerHTML = v.rail();
   if (v.after) v.after();
   card.innerHTML = '<p class="empty">Hover over a part of the ' + { machines: "machine", tools: "endmill", paths: "toolpath or section", feeds: "diagram or a result card", flow: "workflow" }[S.tab] + " to see what it is and why it matters.</p>";
-  tip.hidden = true; curEl = null;
+  tip.hidden = true; curEl = null; PIN = null;
 }
 drawMode(); render();
+/* ================= STELLA: offline guided assistant ================= */
+// Stella artwork shared with the REEF Laser Workflow Training (same mascot across REEF tools).
+var STELLA_ART = `<path d="M79.2 53.3 L78.0 54.0 L76.7 54.6 L75.5 55.1 L74.3 55.6 L73.2 56.0 L72.1 56.3 L71.2 56.6 L70.3 56.9 L69.7 57.1 L69.1 57.4 L68.8 57.6 L68.6 58.0 L68.5 58.3 L68.4 58.6 L68.4 58.9 L68.3 59.2 L68.2 59.6 L68.1 59.9 L68.0 60.2 L67.9 60.5 L67.7 60.8 L67.6 61.1 L67.5 61.4 L67.4 61.7 L67.2 62.0 L67.1 62.3 L67.0 62.7 L67.1 63.1 L67.4 63.6 L67.7 64.3 L68.2 65.0 L68.7 65.8 L69.3 66.6 L69.9 67.6 L70.5 68.7 L71.1 69.8 L71.7 71.0 L72.2 72.4 L72.7 73.7 L73.0 75.2 L73.3 76.7 L73.4 78.2 L73.4 79.8 L73.2 81.4 L73.0 83.0 L72.5 84.6 L72.0 86.1 L71.3 87.5 L70.4 88.9 L69.5 90.2 L68.5 91.3 L67.5 92.4 L66.4 93.2 L65.4 93.9 L64.3 94.5 L63.3 94.9 L62.9 95.0 L62.5 94.9 L62.2 94.7 L62.0 94.4 L61.8 94.0 L61.6 93.5 L61.4 92.8 L61.2 92.1 L61.0 91.3 L60.7 90.4 L60.4 89.5 L60.1 88.5 L59.7 87.5 L59.3 86.4 L58.8 85.3 L58.3 84.2 L57.8 83.0 L57.2 81.9 L56.6 80.8 L56.0 79.7 L55.4 78.6 L54.9 77.6 L54.3 76.7 L53.8 75.8 L53.3 75.0 L52.8 74.3 L52.4 73.7 L52.0 73.3 L51.7 73.0 L51.3 73.0 L51.0 73.0 L50.7 73.0 L50.3 73.0 L50.0 73.0 L49.7 73.0 L49.3 73.0 L49.0 73.0 L48.7 73.0 L48.3 72.9 L48.0 72.9 L47.7 73.0 L47.3 73.2 L46.9 73.7 L46.4 74.3 L45.9 75.0 L45.4 75.9 L44.8 76.8 L44.2 77.9 L43.5 78.9 L42.8 80.1 L42.1 81.2 L41.4 82.4 L40.7 83.6 L40.0 84.7 L39.3 85.9 L38.6 87.0 L38.0 88.1 L37.4 89.2 L36.8 90.2 L36.3 91.1 L35.8 92.0 L35.3 92.7 L34.9 93.4 L34.4 94.0 L34.0 94.5 L33.6 94.9 L33.1 95.2 L32.7 95.3 L32.2 95.3 L31.7 95.1 L30.8 94.6 L29.8 94.0 L28.9 93.2 L28.0 92.2 L27.2 91.1 L26.4 89.9 L25.8 88.6 L25.2 87.2 L24.8 85.7 L24.4 84.2 L24.2 82.6 L24.2 81.0 L24.3 79.4 L24.5 77.8 L24.8 76.3 L25.2 74.7 L25.8 73.3 L26.4 71.9 L27.0 70.6 L27.8 69.3 L28.5 68.2 L29.2 67.1 L30.0 66.1 L30.6 65.2 L31.3 64.4 L31.8 63.7 L32.2 63.1 L32.5 62.5 L32.7 62.1 L32.6 61.7 L32.5 61.4 L32.4 61.1 L32.3 60.8 L32.1 60.5 L32.0 60.2 L31.9 59.9 L31.8 59.6 L31.7 59.2 L31.6 58.9 L31.6 58.6 L31.5 58.3 L31.4 58.0 L31.2 57.6 L30.9 57.4 L30.3 57.1 L29.7 56.9 L28.8 56.6 L27.9 56.3 L26.8 56.0 L25.7 55.6 L24.5 55.1 L23.3 54.6 L22.0 54.0 L20.8 53.3 L19.5 52.5 L18.3 51.6 L17.1 50.6 L16.0 49.5 L15.0 48.3 L14.0 47.0 L13.2 45.6 L12.5 44.2 L11.9 42.7 L11.5 41.2 L11.2 39.6 L11.1 38.1 L11.1 36.6 L11.2 35.2 L11.4 33.9 L11.7 32.7 L12.2 31.6 L12.7 30.7 L13.0 30.3 L13.3 30.1 L13.7 30.0 L14.2 30.0 L14.7 30.1 L15.2 30.4 L15.8 30.7 L16.5 31.1 L17.3 31.5 L18.1 32.0 L19.0 32.5 L20.0 33.0 L21.0 33.5 L22.1 34.1 L23.2 34.6 L24.4 35.2 L25.6 35.7 L26.8 36.3 L28.0 36.8 L29.1 37.3 L30.3 37.8 L31.4 38.3 L32.5 38.7 L33.5 39.1 L34.4 39.4 L35.2 39.7 L35.9 39.9 L36.5 40.0 L37.0 40.0 L37.3 39.9 L37.5 39.7 L37.8 39.4 L38.0 39.2 L38.3 39.0 L38.6 38.8 L38.8 38.6 L39.1 38.4 L39.4 38.2 L39.7 38.1 L39.9 37.9 L40.2 37.6 L40.3 37.2 L40.3 36.5 L40.3 35.7 L40.2 34.8 L40.2 33.8 L40.1 32.6 L40.0 31.3 L40.0 30.0 L40.0 28.6 L40.1 27.1 L40.2 25.6 L40.4 24.1 L40.7 22.5 L41.2 21.0 L41.7 19.5 L42.3 18.0 L43.1 16.6 L44.0 15.2 L44.9 14.0 L46.0 12.8 L47.1 11.8 L48.2 10.9 L49.4 10.1 L50.7 9.5 L51.9 9.0 L53.1 8.6 L54.3 8.4 L55.4 8.4 L56.4 8.4 L57.0 8.6 L57.4 8.8 L57.8 9.2 L58.1 9.7 L58.4 10.3 L58.6 11.0 L58.7 11.8 L58.8 12.6 L58.9 13.6 L58.9 14.7 L58.9 15.8 L58.9 17.0 L58.9 18.3 L58.9 19.6 L58.9 21.0 L58.8 22.4 L58.8 23.8 L58.8 25.2 L58.7 26.7 L58.7 28.1 L58.6 29.4 L58.6 30.8 L58.5 32.0 L58.5 33.1 L58.4 34.2 L58.4 35.1 L58.4 35.9 L58.5 36.5 L58.7 37.0 L58.9 37.2 L59.2 37.4 L59.5 37.5 L59.8 37.7 L60.1 37.9 L60.3 38.1 L60.6 38.2 L60.9 38.4 L61.2 38.6 L61.4 38.8 L61.7 39.0 L62.0 39.2 L62.2 39.4 L62.5 39.7 L62.7 39.9 L63.0 40.0 L63.5 40.0 L64.1 39.9 L64.8 39.7 L65.6 39.4 L66.5 39.1 L67.5 38.7 L68.6 38.3 L69.7 37.8 L70.9 37.3 L72.0 36.8 L73.2 36.3 L74.4 35.7 L75.6 35.2 L76.8 34.6 L77.9 34.1 L79.0 33.5 L80.0 33.0 L81.0 32.5 L81.9 32.0 L82.7 31.5 L83.5 31.1 L84.2 30.7 L84.8 30.4 L85.3 30.1 L85.8 30.0 L86.3 30.0 L86.7 30.1 L87.0 30.3 L87.3 30.7 L87.8 31.6 L88.3 32.7 L88.6 33.9 L88.8 35.2 L88.9 36.6 L88.9 38.1 L88.8 39.6 L88.5 41.2 L88.1 42.7 L87.5 44.2 L86.8 45.6 L86.0 47.0 L85.0 48.3 L84.0 49.5 L82.9 50.6 L81.7 51.6 L80.5 52.5 Z" fill="#F15B29" stroke="#F15B29" stroke-width="3" stroke-linejoin="round"/> <path d="M79.2 53.3 L78.0 54.0 L76.7 54.6 L75.5 55.1 L74.3 55.6 L73.2 56.0 L72.1 56.3 L71.2 56.6 L70.3 56.9 L69.7 57.1 L69.1 57.4 L68.8 57.6 L68.6 58.0 L68.5 58.3 L68.4 58.6 L68.4 58.9 L68.3 59.2 L68.2 59.6 L68.1 59.9 L68.0 60.2 L67.9 60.5 L67.7 60.8 L67.6 61.1 L67.5 61.4 L67.4 61.7 L67.2 62.0 L67.1 62.3 L67.0 62.7 L67.1 63.1 L67.4 63.6 L67.7 64.3 L68.2 65.0 L68.7 65.8 L69.3 66.6 L69.9 67.6 L70.5 68.7 L71.1 69.8 L71.7 71.0 L72.2 72.4 L72.7 73.7 L73.0 75.2 L73.3 76.7 L73.4 78.2 L73.4 79.8 L73.2 81.4 L73.0 83.0 L72.5 84.6 L72.0 86.1 L71.3 87.5 L70.4 88.9 L69.5 90.2 L68.5 91.3 L67.5 92.4 L66.4 93.2 L65.4 93.9 L64.3 94.5 L63.3 94.9 L62.9 95.0 L62.5 94.9 L62.2 94.7 L62.0 94.4 L61.8 94.0 L61.6 93.5 L61.4 92.8 L61.2 92.1 L61.0 91.3 L60.7 90.4 L60.4 89.5 L60.1 88.5 L59.7 87.5 L59.3 86.4 L58.8 85.3 L58.3 84.2 L57.8 83.0 L57.2 81.9 L56.6 80.8 L56.0 79.7 L55.4 78.6 L54.9 77.6 L54.3 76.7 L53.8 75.8 L53.3 75.0 L52.8 74.3 L52.4 73.7 L52.0 73.3 L51.7 73.0 L51.3 73.0 L51.0 73.0 L50.7 73.0 L50.3 73.0 L50.0 73.0 L49.7 73.0 L49.3 73.0 L49.0 73.0 L48.7 73.0 L48.3 72.9 L48.0 72.9 L47.7 73.0 L47.3 73.2 L46.9 73.7 L46.4 74.3 L45.9 75.0 L45.4 75.9 L44.8 76.8 L44.2 77.9 L43.5 78.9 L42.8 80.1 L42.1 81.2 L41.4 82.4 L40.7 83.6 L40.0 84.7 L39.3 85.9 L38.6 87.0 L38.0 88.1 L37.4 89.2 L36.8 90.2 L36.3 91.1 L35.8 92.0 L35.3 92.7 L34.9 93.4 L34.4 94.0 L34.0 94.5 L33.6 94.9 L33.1 95.2 L32.7 95.3 L32.2 95.3 L31.7 95.1 L30.8 94.6 L29.8 94.0 L28.9 93.2 L28.0 92.2 L27.2 91.1 L26.4 89.9 L25.8 88.6 L25.2 87.2 L24.8 85.7 L24.4 84.2 L24.2 82.6 L24.2 81.0 L24.3 79.4 L24.5 77.8 L24.8 76.3 L25.2 74.7 L25.8 73.3 L26.4 71.9 L27.0 70.6 L27.8 69.3 L28.5 68.2 L29.2 67.1 L30.0 66.1 L30.6 65.2 L31.3 64.4 L31.8 63.7 L32.2 63.1 L32.5 62.5 L32.7 62.1 L32.6 61.7 L32.5 61.4 L32.4 61.1 L32.3 60.8 L32.1 60.5 L32.0 60.2 L31.9 59.9 L31.8 59.6 L31.7 59.2 L31.6 58.9 L31.6 58.6 L31.5 58.3 L31.4 58.0 L31.2 57.6 L30.9 57.4 L30.3 57.1 L29.7 56.9 L28.8 56.6 L27.9 56.3 L26.8 56.0 L25.7 55.6 L24.5 55.1 L23.3 54.6 L22.0 54.0 L20.8 53.3 L19.5 52.5 L18.3 51.6 L17.1 50.6 L16.0 49.5 L15.0 48.3 L14.0 47.0 L13.2 45.6 L12.5 44.2 L11.9 42.7 L11.5 41.2 L11.2 39.6 L11.1 38.1 L11.1 36.6 L11.2 35.2 L11.4 33.9 L11.7 32.7 L12.2 31.6 L12.7 30.7 L13.0 30.3 L13.3 30.1 L13.7 30.0 L14.2 30.0 L14.7 30.1 L15.2 30.4 L15.8 30.7 L16.5 31.1 L17.3 31.5 L18.1 32.0 L19.0 32.5 L20.0 33.0 L21.0 33.5 L22.1 34.1 L23.2 34.6 L24.4 35.2 L25.6 35.7 L26.8 36.3 L28.0 36.8 L29.1 37.3 L30.3 37.8 L31.4 38.3 L32.5 38.7 L33.5 39.1 L34.4 39.4 L35.2 39.7 L35.9 39.9 L36.5 40.0 L37.0 40.0 L37.3 39.9 L37.5 39.7 L37.8 39.4 L38.0 39.2 L38.3 39.0 L38.6 38.8 L38.8 38.6 L39.1 38.4 L39.4 38.2 L39.7 38.1 L39.9 37.9 L40.2 37.6 L40.3 37.2 L40.3 36.5 L40.3 35.7 L40.2 34.8 L40.2 33.8 L40.1 32.6 L40.0 31.3 L40.0 30.0 L40.0 28.6 L40.1 27.1 L40.2 25.6 L40.4 24.1 L40.7 22.5 L41.2 21.0 L41.7 19.5 L42.3 18.0 L43.1 16.6 L44.0 15.2 L44.9 14.0 L46.0 12.8 L47.1 11.8 L48.2 10.9 L49.4 10.1 L50.7 9.5 L51.9 9.0 L53.1 8.6 L54.3 8.4 L55.4 8.4 L56.4 8.4 L57.0 8.6 L57.4 8.8 L57.8 9.2 L58.1 9.7 L58.4 10.3 L58.6 11.0 L58.7 11.8 L58.8 12.6 L58.9 13.6 L58.9 14.7 L58.9 15.8 L58.9 17.0 L58.9 18.3 L58.9 19.6 L58.9 21.0 L58.8 22.4 L58.8 23.8 L58.8 25.2 L58.7 26.7 L58.7 28.1 L58.6 29.4 L58.6 30.8 L58.5 32.0 L58.5 33.1 L58.4 34.2 L58.4 35.1 L58.4 35.9 L58.5 36.5 L58.7 37.0 L58.9 37.2 L59.2 37.4 L59.5 37.5 L59.8 37.7 L60.1 37.9 L60.3 38.1 L60.6 38.2 L60.9 38.4 L61.2 38.6 L61.4 38.8 L61.7 39.0 L62.0 39.2 L62.2 39.4 L62.5 39.7 L62.7 39.9 L63.0 40.0 L63.5 40.0 L64.1 39.9 L64.8 39.7 L65.6 39.4 L66.5 39.1 L67.5 38.7 L68.6 38.3 L69.7 37.8 L70.9 37.3 L72.0 36.8 L73.2 36.3 L74.4 35.7 L75.6 35.2 L76.8 34.6 L77.9 34.1 L79.0 33.5 L80.0 33.0 L81.0 32.5 L81.9 32.0 L82.7 31.5 L83.5 31.1 L84.2 30.7 L84.8 30.4 L85.3 30.1 L85.8 30.0 L86.3 30.0 L86.7 30.1 L87.0 30.3 L87.3 30.7 L87.8 31.6 L88.3 32.7 L88.6 33.9 L88.8 35.2 L88.9 36.6 L88.9 38.1 L88.8 39.6 L88.5 41.2 L88.1 42.7 L87.5 44.2 L86.8 45.6 L86.0 47.0 L85.0 48.3 L84.0 49.5 L82.9 50.6 L81.7 51.6 L80.5 52.5 Z" fill="none" stroke="#B71F34" stroke-width="1.6" stroke-linejoin="round" opacity=".45"/> <g fill="#FCC424" opacity=".8"><circle cx="49.6" cy="25.6" r="2.3"/><circle cx="50.6" cy="20.2" r="2.0"/><circle cx="52.1" cy="15.6" r="1.7"/><circle cx="54.0" cy="12.0" r="1.5"/><circle cx="76.1" cy="44.6" r="2.3"/><circle cx="80.3" cy="41.6" r="2.0"/><circle cx="83.5" cy="38.2" r="1.7"/><circle cx="85.6" cy="34.8" r="1.5"/><circle cx="64.5" cy="77.2" r="2.3"/><circle cx="65.7" cy="82.1" r="2.0"/><circle cx="65.7" cy="86.7" r="1.7"/><circle cx="65.0" cy="90.7" r="1.5"/><circle cx="34.1" cy="77.1" r="2.3"/><circle cx="32.2" cy="82.1" r="2.0"/><circle cx="31.3" cy="86.7" r="1.7"/><circle cx="31.1" cy="90.8" r="1.5"/><circle cx="23.9" cy="44.6" r="2.3"/><circle cx="19.7" cy="41.6" r="2.0"/><circle cx="16.5" cy="38.2" r="1.7"/><circle cx="14.4" cy="34.8" r="1.5"/></g> <ellipse cx="41" cy="50" rx="5" ry="6.2" fill="#010101"/><ellipse cx="59" cy="50" rx="5" ry="6.2" fill="#010101"/> <circle cx="42.8" cy="47.6" r="2" fill="#fff"/><circle cx="60.8" cy="47.6" r="2" fill="#fff"/> <circle cx="39.6" cy="52.6" r=".9" fill="#fff"/><circle cx="57.6" cy="52.6" r=".9" fill="#fff"/> <ellipse cx="33.5" cy="59" rx="4.2" ry="2.8" fill="#B71F34" opacity=".5"/><ellipse cx="66.5" cy="59" rx="4.2" ry="2.8" fill="#B71F34" opacity=".5"/> <defs><clipPath id="eyeClip"><ellipse cx="41" cy="50" rx="5.8" ry="7"/><ellipse cx="59" cy="50" rx="5.8" ry="7"/></clipPath></defs> <g clip-path="url(#eyeClip)"> <g class="lid"><rect x="34" y="42" width="14" height="9" fill="#F15B29"/><path d="M34.5 51 Q41 53 47.5 51" fill="none" stroke="#010101" stroke-width="1.8" stroke-linecap="round"/></g> <g class="lid"><rect x="52" y="42" width="14" height="9" fill="#F15B29"/><path d="M52.5 51 Q59 53 65.5 51" fill="none" stroke="#010101" stroke-width="1.8" stroke-linecap="round"/></g> </g> <g class="smile"> <path d="M45 58 Q50 65 55 58 Z" fill="#B71F34" stroke="#010101" stroke-width="2.2" stroke-linejoin="round"/> <path d="M47.6 61.2 Q50 63.6 52.4 61.2" fill="none" stroke="#F15B29" stroke-width="2" stroke-linecap="round"/> </g> <ellipse class="yawn" cx="50" cy="62" rx="3.6" ry="4.6" fill="#B71F34" stroke="#010101" stroke-width="2.2"/>`, starN = 0;
+function starSVG(sz, cls, id) {
+  starN++;
+  return '<svg class="star ' + (cls || "") + '"' + (id ? ' id="' + id + '"' : "") + ' viewBox="0 0 100 100" width="' + sz + '" height="' + sz + '" aria-hidden="true">' +
+    STELLA_ART.replace(/eyeClip/g, "eyeClip" + starN) + "</svg>";
+}
+var st = document.createElement("div"); st.id = "stella";
+st.innerHTML = '<div class="hello" id="sHello" hidden>Hi! I’m Stella. Want help getting started?<div class="row"><button type="button" id="sYes">Yes please</button><button type="button" id="sNo">No thanks</button></div></div>' +
+  '<div class="spanel" id="sPanel" role="dialog" aria-label="Stella, your CNC guide" hidden><div class="shead">' + starSVG(30, "mini") + '<b>Stella</b><span>your CNC guide</span><button type="button" class="sreset" id="sReset" title="Start the chat over">↺ Reset</button><button type="button" id="sClose" aria-label="Close">×</button></div>' +
+  '<div class="msgs" id="sMsgs" aria-live="polite"></div><div class="opts" id="sOpts"></div></div>' +
+  '<button type="button" class="stella-btn" id="sBtn" aria-label="Open Stella, the CNC guide" aria-expanded="false"><span class="zzz" aria-hidden="true"><i></i><i></i><i></i><b>z</b><b>z</b></span>' + starSVG(84, "idle", "sStar") + "</button>";
+document.body.appendChild(st);
+var sMsgs = $("sMsgs"), sOpts = $("sOpts"), sPanel = $("sPanel"), CH = [];
+function say(html) { var d = document.createElement("div"); d.className = "msg s"; d.innerHTML = html; sMsgs.appendChild(d); while (sMsgs.children.length > 40) sMsgs.removeChild(sMsgs.firstChild); sMsgs.scrollTop = sMsgs.scrollHeight; }
+function you(t) { var d = document.createElement("div"); d.className = "msg u"; d.textContent = t; sMsgs.appendChild(d); sMsgs.scrollTop = sMsgs.scrollHeight; }
+function choices(list) { CH = list.filter(Boolean); sOpts.innerHTML = CH.map(function (o, i) { return '<button type="button" class="chip' + (o[2] ? " go" : "") + '" data-i="' + i + '">' + o[0] + "</button>"; }).join(""); }
+sOpts.addEventListener("click", function (e) { var b = e.target.closest("[data-i]"); if (!b) return; var o = CH[+b.getAttribute("data-i")]; var tmp = document.createElement("div"); tmp.innerHTML = o[0]; you(tmp.textContent); o[1](); });
+function openPanel(o) { if (o && sPanel.hidden) wiggle(); sPanel.hidden = !o; $("sHello").hidden = true; $("sBtn").setAttribute("aria-expanded", o); LS.set("reefcnc.stella", "seen"); if (o && !sMsgs.children.length) home(); }
+$("sBtn").onclick = function () { openPanel(sPanel.hidden); };
+$("sClose").onclick = function () { openPanel(false); clearSpot(); };
+$("sReset").onclick = function () { resetChat(); };
+$("sYes").onclick = function () { openPanel(true); };
+$("sNo").onclick = function () { $("sHello").hidden = true; LS.set("reefcnc.stella", "seen"); };
+if (LS.get("reefcnc.stella") !== "seen") setTimeout(function () { if (sPanel.hidden) { $("sHello").hidden = false; wiggle(); } }, 1200);
+/* Stella's moods (same behaviour as the laser trainer): bob when idle, wiggle to get attention, jump when you get it right, doze off when ignored. */
+var mascot = $("sStar"), boredT = 0;
+function wiggle() { unbore(); mascot.classList.remove("idle", "wiggle"); void mascot.getBoundingClientRect(); mascot.classList.add("wiggle"); setTimeout(function () { mascot.classList.remove("wiggle"); mascot.classList.add("idle"); }, 1850); }
+function jump() { unbore(); mascot.classList.remove("idle", "wiggle", "jump"); void mascot.getBoundingClientRect(); mascot.classList.add("jump"); setTimeout(function () { mascot.classList.remove("jump"); mascot.classList.add("idle"); }, 1050); }
+function bore() { if (!sPanel.hidden || mascot.classList.contains("jump")) { poke(); return; } mascot.classList.remove("idle", "wiggle"); mascot.classList.add("bored"); st.classList.add("bored"); }
+function unbore() { if (!mascot.classList.contains("bored")) return; mascot.classList.remove("bored"); st.classList.remove("bored"); mascot.classList.add("idle"); }
+function poke() { unbore(); clearTimeout(boredT); boredT = setTimeout(bore, 45000); }
+["pointerdown", "keydown"].forEach(function (ev) { document.addEventListener(ev, poke, true); });
+poke();
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !sPanel.hidden) openPanel(false); });
+
+function setMode(m) { S.mode = m; LS.set("reefcnc.mode", m); drawMode(); render(); }
+/* Pointing at things: a yellow ring drawn on top of the page (works for SVG parts, buttons and panels,
+   and even with animations turned off). Stella's panel moves out of the way if it would cover the target. */
+var ring = document.createElement("div"); ring.className = "spot-ring"; ring.hidden = true;
+ring.innerHTML = '<span class="spot-tag">Here!</span>'; document.body.appendChild(ring);
+var spotEl = null, spotUntil = 0, spotRaf = 0;
+function placeRing() {
+  if (!spotEl || !document.body.contains(spotEl) || Date.now() > spotUntil) { clearSpot(); return; }
+  var r = spotEl.getBoundingClientRect(), pad = 6;
+  ring.style.left = (r.left - pad) + "px"; ring.style.top = (r.top - pad) + "px";
+  ring.style.width = (r.width + pad * 2) + "px"; ring.style.height = (r.height + pad * 2) + "px";
+  ring.classList.toggle("below", r.top < 40);
+  dodge(r);
+  spotRaf = requestAnimationFrame(placeRing);
+}
+function dodge(r) {
+  if (sPanel.hidden) return;
+  sPanel.classList.remove("dockL");
+  var p = sPanel.getBoundingClientRect();
+  var hit = !(r.right < p.left || r.left > p.right || r.bottom < p.top || r.top > p.bottom);
+  if (hit) sPanel.classList.add("dockL");
+}
+function clearSpot() {
+  cancelAnimationFrame(spotRaf); ring.hidden = true; spotEl = null; sPanel.classList.remove("dockL");
+  document.querySelectorAll(".pulse").forEach(function (n) { n.classList.remove("pulse"); });
+}
+function spot(sel) {
+  clearSpot();
+  var el = document.querySelector(sel); if (!el) return;
+  el.classList.add("pulse"); spotEl = el; spotUntil = Date.now() + 9000;
+  var r = el.getBoundingClientRect(); if (r.top < 70 || r.bottom > window.innerHeight - 20) el.scrollIntoView({ block: "center", behavior: "smooth" });
+  ring.hidden = false; placeRing();
+}
+document.addEventListener("pointerdown", function (e) { if (spotEl && !e.target.closest("#stella")) clearSpot(); }, true);
+function resetChat() {
+  clearSpot(); Q = null; P = {}; sMsgs.innerHTML = ""; home();
+}
+function go(tab, set, sel) { if (set) set(); S.tab = tab; LS.set("reefcnc.tab", tab); render(); if (sel) setTimeout(function () { spot(sel); }, 60); }
+var BACK = ["Back to start", function () { home(); }];
+var RESET = ["↺ Reset chat", function () { resetChat(); }];
+
+function home() {
+  say("Hi, I’m Stella! I can point you to a good place to start. What sounds right?");
+  choices([["I’m new to CNC", newbie, 1], ["I have a project in mind", proj], ["Give me the guided tour", function () { tour(0); }], ["Help with this page", tabHelp], ["Quiz me", quizStart], ["Pick my level", levelQ]]);
+}
+function newbie() {
+  say("Welcome! Here’s a good path for your first visit:<ol><li>Meet the two machines</li><li>Learn the three endmills</li><li>Watch a toolpath run</li><li>Go through the safety checklist</li></ol>" + (S.mode > 1 ? "I switched you to <b>Beginner mode</b> so things stay simple. " : "") + "You can change your level any time with the mode button at the top.");
+  if (S.mode > 1) setMode(1);
+  choices([["Start the tour", function () { tour(0); }, 1], ["Show me the machines", function () { go("machines", function () { S.mach = "so"; }, '#stage [data-info="so_spindle"]'); say("Hover the glowing spindle — it spins the endmill. Then hover around to explore the rest."); choices([["Next: endmills", function () { tour(3); }, 1], BACK]); }], BACK]);
+}
+function levelQ() {
+  say("Have you run a CNC machine before?");
+  var done = function (m, t) { return function () { setMode(m); say(t); choices([["Take the guided tour", function () { tour(0); }, 1], BACK]); }; };
+  choices([["Never", done(1, "<b>Beginner mode</b> it is: the essentials and safety first.")],
+    ["A few times, with help", done(2, "<b>Intermediate mode</b>: more toolpaths, settings and terms.")],
+    ["Yes, I make my own toolpaths", done(3, "<b>Expert mode</b>: everything, including the math behind feeds and toolpaths.")]]);
+}
+/* --- project helper --- */
+var P = {};
+function proj() {
+  P = {}; say("Fun! What are you making it from?");
+  var m = function (k) { return function () { P.mat = k; projSize(); }; };
+  choices([["Wood / plywood", m("ply")], ["Plastic", m("hdpe")], ["Foam", m("foam")], ["Aluminum", m("al")], BACK]);
+}
+function projSize() {
+  say("How big is the part?");
+  choices([["Small — fits in 300 × 200 mm (about 12 × 8 in)", function () { P.big = false; projShape(); }], ["Bigger than that", function () { P.big = true; projShape(); }]]);
+}
+function projShape() {
+  say("Is it flat (cut-outs, pockets, signs, engraving) or a curved 3D surface?");
+  choices([["Flat / 2D", function () { P.d3 = false; projResult(); }], ["Curved / 3D", function () { P.d3 = true; projResult(); }]]);
+}
+function projResult() {
+  if (P.mat === "al" && P.big) {
+    say("Aluminum runs on the <b>Carvera Air</b> at REEF, and its work area is 300 × 200 × 130 mm — this part won’t fit. Talk to REEF staff about splitting it into smaller pieces or another process.");
+    choices([["Try another project", proj], BACK]); return;
+  }
+  var mach = P.mat === "al" ? "ca" : P.big ? "so" : (P.d3 ? "ca" : "so"), sw = mach === "so" && !P.d3 ? "cc" : "f";
+  var op = P.d3 ? "parallel" : sw === "cc" ? "contour" : "contour2d", flowK = mach === "ca" ? "ca_f" : sw === "cc" ? "so_cc" : "so_f";
+  say("<p><b>My suggestion</b></p><ul><li>Machine: <b>" + MACH[mach].name + "</b></li><li>CAM: <b>" + (sw === "cc" ? "Carbide Create" : "Fusion 360") + "</b></li><li>Tools: " +
+    (P.d3 ? "rough with a flat endmill, then finish with a ball endmill" : "a flat endmill for cut-outs and pockets" + (P.mat === "ply" ? " (plus a V-bit if you’re engraving)" : "")) + "</li><li>First toolpath to learn: <b>" + OPS[op].n + "</b></li></ul>" +
+    (mach === "so" && !P.big && !P.d3 ? "<p>The Carvera Air could also do a small flat part in Fusion 360 — the Shapeoko with Carbide Create is the simpler place to start.</p>" : "") +
+    (P.d3 && !P.big ? "<p>The Carvera Air is great for small, precise 3D parts.</p>" : ""));
+  choices([["Show me the toolpath", function () {
+      if (OPS[op].lv > S.mode) { setMode(OPS[op].lv); say("That toolpath lives in <b>" + MODES[OPS[op].lv].n + " mode</b>, so I switched you there."); }
+      go("paths", function () { S.sw = sw; S.op = op; }, "#playBtn"); say("Press the glowing <b>Play</b> button to watch it run. Hover any line to see what it is.");
+      choices([["Show feeds &amp; speeds next", feedsGo, 1], ["Show the workflow", flowGo], BACK]); }, 1],
+    ["Show feeds &amp; speeds", feedsGo], ["Show the workflow", flowGo], ["Start over", proj]]);
+  function feedsGo() { go("feeds", function () { S.f.m = mach; S.f.mat = P.mat; S.f.tool = P.d3 ? "ball" : "flat"; S.f.dia = mach === "ca" ? 3.175 : 6.35; S.f.strat = "slot"; }, "#rail .cards");
+    say("These are starting numbers for " + MACH[mach].short + " in " + MATS[P.mat].n.split(" (")[0].toLowerCase() + ". Hover a card to learn what it means — and always make a test cut."); choices([["Show the workflow", flowGo, 1], BACK]); }
+  function flowGo() { go("flow", function () { S.flow = flowK; }, "#rail .checks"); say("Here’s the path from design to finished part. Tick the checklist before you press start!"); choices([["Quiz me", quizStart], BACK]); }
+}
+/* --- page help --- */
+var TIPS = {
+  machines: [["Hover any part of the machine to learn about it. <b>Click</b> a part to pin it in the Info panel — some have photos.", '#stage [data-info="' + "so_spindle" + '"]', function () { S.mach = "so"; }],
+    ["Switch between the Shapeoko 5 Pro and the Carvera Air here.", '#rail [data-set="mach"]'], ["Not sure which machine to use? Pick your material here.", '#rail [data-set="helpMat"]']],
+  tools: [["Start with the <b>Flat</b> endmill — it does most jobs. Hover the flutes and the tip.", '#stage [data-info="em_flutes"]'],
+    ["The groove on the right shows the shape each tool leaves. Try Ball and Tapered.", '#stage [data-info="em_groove"]'], ["Click a chip here to watch that tool in a toolpath.", "#rail .chips"]],
+  paths: [["Press <b>Play</b> to watch the tool move. Solid red = cutting, dashed blue = moving in the air.", "#playBtn"],
+    ["Switch between Carbide Create and Fusion 360 to see each program’s toolpaths.", '#rail [data-set="sw"]'], ["The side view animates how the cut happens, pass by pass — press its <b>Play</b> button.", "#secPlay"]],
+  feeds: [["Pick the machine, material and tool — the numbers update instantly.", '#rail [data-set="f.mat"]'], ["Hover a result card to learn what it means.", "#rail .cards"],
+    ["Numbers are a starting point. Use <b>Listen &amp; look</b> to fine-tune by sound and chips.", "#rail section:last-child"]],
+  flow: [["Hover each step to see what happens from design to finished part.", '#stage [data-info="wf_0"]'], ["Tick this checklist before every job.", "#rail .checks"],
+    ["Pick your machine and software — the steps change to match.", '#rail [data-set="flow"]']]
+};
+function tabHelp(n) {
+  n = typeof n === "number" ? n : 0; var t = TIPS[S.tab], tp = t[n % t.length];
+  if (tp[2]) { tp[2](); render(); }
+  say(tp[0]); setTimeout(function () { spot(tp[1]); }, 60);
+  choices([["Another tip", function () { tabHelp(n + 1); }, 1], BACK]);
+}
+/* --- guided tour --- */
+var TOUR = [
+  ["machines", "#modeBtn", "This button sets your level. <b>Beginner</b> keeps it simple; <b>Expert</b> shows the math.", function () { S.mach = "so"; }],
+  ["machines", '#stage [data-info="so_spindle"]', "Hover any part of the machine. <b>Click</b> it to pin the details in the Info panel — some parts have photos.", function () { S.mach = "so"; }],
+  ["machines", '#rail [data-set="mach"][data-v="ca"]', "Switch between the Shapeoko 5 Pro and the Carvera Air here."],
+  ["tools", '#rail [data-set="tool"][data-v="flat"]', "REEF uses three endmills: flat, ball and tapered. Flat does most jobs.", function () { S.tool = "flat"; }],
+  ["tools", '#stage [data-info="em_groove"]', "This shows the groove each tool leaves in the material."],
+  ["paths", "#playBtn", "Press <b>Play</b> to watch a toolpath. Solid red = cutting, dashed blue = moving in the air.", function () { S.sw = "cc"; S.op = "contour"; }],
+  ["paths", "#secPlay", "This side-view animation shows <b>how the operation cuts</b>, pass by pass — with Play/Pause and Reset."],
+  ["feeds", "#rail .cards", "Pick machine, material and tool to get starting speeds and feeds."],
+  ["flow", "#rail .checks", "Before every job, run this checklist. When in doubt, ask REEF staff!"]
+];
+function tour(i) {
+  var t = TOUR[i]; go(t[0], t[3], t[1]);
+  say("<b>Step " + (i + 1) + " of " + TOUR.length + "</b><br>" + t[2]);
+  choices([i < TOUR.length - 1 ? ["Next →", function () { tour(i + 1); }, 1] : ["Finish", function () { jump(); say("You’re all set! Click me any time you want a hand."); choices([["Quiz me", quizStart, 1], BACK]); }, 1],
+    i > 0 ? ["← Back", function () { tour(i - 1); }] : null, ["End tour", home]]);
+}
+/* --- quiz --- */
+var QUIZ = [
+  ["Which machine cuts aluminum at REEF?", ["Carvera Air", "Shapeoko 5 Pro"], "Aluminum stays on the Carvera Air.", 1, ["machines", function () { S.mach = "ca"; }, '#stage [data-info="ca_stock"]']],
+  ["Which endmill makes smooth, curved 3D surfaces?", ["Ball", "Flat", "V-bit"], "The round tip blends passes into a smooth surface.", 1, ["tools", function () { S.tool = "ball"; }, '#stage [data-info="em_groove"]']],
+  ["What are tabs for?", ["Keeping the part attached so it can’t fly loose", "Making the cut faster", "Cooling the tool"], "Cut them off with a flush-cut saw and sand.", 1, ["paths", function () { S.sw = "cc"; S.op = "contour"; }, '#stage [data-info="tp_tab"]']],
+  ["Dashed blue lines in a toolpath are…", ["Rapids — the tool is lifted, moving fast", "Cuts", "Tabs"], "Make sure clamps and screws are below the safe height.", 1, ["paths", null, '#stage [data-info="tp_rapid"]']],
+  ["Where is Z0 usually set?", ["Top of the stock", "Bottom of the spoilboard", "Tip of the spindle"], "It must match the origin you chose in CAM.", 1, ["paths", null, '#stage [data-info="tp_zero"]']],
+  ["Where do the screws go when you hold stock to the spoilboard?", ["In waste areas, outside every toolpath", "Anywhere is fine", "Inside the pocket"], "An endmill that hits a steel screw breaks.", 1, ["machines", function () { S.mach = "so"; }, '#stage [data-info="so_clamps"]']],
+  ["Feed rate equals…", ["RPM × flutes × chipload", "RPM ÷ flutes", "Chipload × depth of cut"], "Change any one of those and the feed changes.", 2, ["feeds", null, '#rail [data-info="fs_feed"]']],
+  ["Fine dust and a burning smell usually mean…", ["Rubbing — chipload is too small", "The feed is too high", "Everything is perfect"], "Raise feed or lower RPM to make real chips.", 2, ["feeds", null, "#rail section:last-child"]],
+  ["Which program makes 3D toolpaths at REEF?", ["Fusion 360", "Carbide Create"], "Carbide Create is for 2D jobs on the Shapeoko.", 2, ["paths", function () { S.sw = "f"; }, '#rail [data-set="sw"]']],
+  ["Adaptive clearing works best with…", ["Deep depth of cut, narrow width", "Shallow depth, full width", "Full depth, full width"], "Steady tool load — great for the 200 W Carvera Air.", 3, ["paths", function () { S.sw = "f"; S.op = "adaptive"; }, "#playBtn"]],
+  ["A 90° V-bit cutting 2 mm deep makes a groove how wide?", ["4 mm", "2 mm", "1 mm"], "Width = 2 × depth × tan(45°) = 2 × depth.", 3, ["tools", function () { S.tool = "taper"; S.taper = 1; }, '#stage [data-info="em_groove"]']]
+];
+var Q = null;
+function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function quizStart() { Q = { list: shuffle(QUIZ.filter(function (q) { return q[3] <= S.mode; })).slice(0, 4), i: 0, score: 0 }; say("Quick quiz — " + Q.list.length + " questions at your level. Ready?"); ask(); }
+function ask() {
+  if (Q.i >= Q.list.length) { say("You got <b>" + Q.score + " of " + Q.list.length + "</b>. " + (Q.score === Q.list.length ? "Perfect!" : "Nice work — try again to see different questions.")); choices([["Quiz me again", quizStart, 1], BACK]); return; }
+  var q = Q.list[Q.i], ans = shuffle(q[1].map(function (t, i) { return { t: t, ok: i === 0 }; }));
+  say("<b>Q" + (Q.i + 1) + ".</b> " + q[0]);
+  choices(ans.map(function (a) { return [a.t, function () {
+    if (a.ok) { Q.score++; jump(); say("Correct! " + q[2]); } else say("Not quite — it’s <b>" + q[1][0] + "</b>. " + q[2]);
+    Q.i++;
+    choices([["Next question", ask, 1], ["Show me", function () { go(q[4][0], q[4][1], q[4][2]); say("There it is — look for the yellow ring on the page."); choices([["Next question", ask, 1], ["Stop quiz", home]]); }], ["Stop quiz", home]]);
+  }]; }));
+}
+
+/* ================= STAFF PHOTO MODE ================= */
+var sb = $("staffBar");
+function drawStaff() {
+  sb.hidden = !STAFF; if (!STAFF) return;
+  var keys = Object.keys(PHOTO_KEYS), have = keys.filter(function (k) { return PHOTOS[k]; }).length;
+  sb.innerHTML = '<div class="in"><b>Staff photo mode</b><span>' + have + " of " + keys.length + " suggested photos added. Pick an item, then use <b>Add photo</b> in the Info panel. When done, save the new file.</span>" +
+    '<div class="chips">' + keys.map(function (k) { return '<button type="button" class="chip" data-pk="' + k + '">' + (PHOTOS[k] ? "✓ " : "") + I[k].t + "</button>"; }).join("") + "</div>" +
+    '<button type="button" class="btn pri" id="saveHtml">Save HTML with photos</button><button type="button" class="btn sec" id="exitStaff">Exit staff mode</button></div>';
+}
+function jumpTo(k) {
+  var pre = k.slice(0, 3);
+  go(pre === "so_" || pre === "ca_" ? "machines" : "tools", function () {
+    if (pre === "so_") S.mach = "so"; else if (pre === "ca_") S.mach = "ca";
+    else if (k === "em_helix") { S.tool = "flat"; if (S.mode < 2) { S.mode = 2; drawMode(); } }
+    else S.tool = k.slice(3);
+  });
+  var el = document.querySelector('#stage [data-info="' + k + '"]') || document.querySelector('[data-info="' + k + '"]');
+  if (el) { showCard(el, true); el.scrollIntoView({ block: "center", behavior: "smooth" }); } else cardKey(k);
+}
+function readPhoto(file, cb) {
+  var fr = new FileReader();
+  fr.onload = function () { var im = new Image(); im.onload = function () {
+    var s = Math.min(1, 1100 / Math.max(im.width, im.height)), cv = document.createElement("canvas");
+    cv.width = Math.round(im.width * s); cv.height = Math.round(im.height * s); cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height);
+    cb(cv.toDataURL("image/jpeg", 0.82)); }; im.src = fr.result; };
+  fr.readAsDataURL(file);
+}
+function saveHTML() {
+  var tag = '<script type="application/json" id="photoData">', i0 = INITIAL.indexOf(tag), i1 = INITIAL.indexOf("</" + "script>", i0);
+  if (i0 < 0 || i1 < 0) { alert("Couldn’t find the photo block in this file."); return; }
+  var out = "<!doctype html>\n" + INITIAL.slice(0, i0 + tag.length) + JSON.stringify(PHOTOS).replace(/</g, "\\u003c") + INITIAL.slice(i1);
+  var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([out], { type: "text/html" })); a.download = "reef-cnc-milling-trainer.html";
+  document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+sb.addEventListener("click", function (e) {
+  var c = e.target.closest("[data-pk]"); if (c) { jumpTo(c.getAttribute("data-pk")); return; }
+  if (e.target.id === "saveHtml") saveHTML();
+  if (e.target.id === "exitStaff") { STAFF = false; drawStaff(); }
+});
+card.addEventListener("change", function (e) {
+  var t = e.target; if (!t.hasAttribute("data-photo") || !t.files[0]) return;
+  var key = t.getAttribute("data-photo");
+  readPhoto(t.files[0], function (url) { PHOTOS[key] = url; cardKey(key); drawStaff(); });
+});
+card.addEventListener("click", function (e) {
+  var b = e.target.closest("[data-unphoto]"); if (!b) return; var key = b.getAttribute("data-unphoto"); delete PHOTOS[key]; cardKey(key); drawStaff();
+});
+document.addEventListener("keydown", function (e) { if (e.ctrlKey && e.altKey && e.shiftKey && (e.key === "P" || e.key === "p")) { STAFF = !STAFF; drawStaff(); } });
+drawStaff();
+
 })();
 </script>
 </body></html>
