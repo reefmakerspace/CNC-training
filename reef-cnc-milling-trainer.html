@@ -1,0 +1,1133 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REEF CNC Milling Trainer</title>
+<style>
+/* Layout matches the REEF Nametag Maker: brand bar, tab row, visual stage (left, sticky) beside a control rail (right). */
+:root{
+  --red:#B71F34; --yellow:#FCC424; --blue:#05A7E0; --aqua:#7DCFD8; --ink:#010101; --reef-dark:#231F20; --orange:#F15B29; --gray:#424143;
+  --bg:#F2F4F5; --surface:#FFFFFF; --fg:#151314; --muted:#5A5F63; --line:#D5DADD; --sel:#010101; --sel-fg:#FFFFFF;
+  --stage:#E4E9EB; --focus:#05A7E0; --metal:#B5BBC0; --dark:#2B2829; --wood:#E8C99A; --woodline:#8A6A3E;
+  --f-display:"Arial Black","Arial Bold",Arial,Helvetica,sans-serif;
+  --f-body:"Post Grotesk",Arial,Helvetica,sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --lvl:#5DBB46;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#161415; --surface:#231F20; --fg:#F1F0F0; --muted:#A9A5A6; --line:#3A3536; --sel:#FFFFFF; --sel-fg:#010101;
+  --stage:#2C2829; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#161415; --surface:#231F20; --fg:#F1F0F0; --muted:#A9A5A6; --line:#3A3536; --sel:#FFFFFF; --sel-fg:#010101;
+  --stage:#2C2829; color-scheme:dark;}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);margin:0}
+body{color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar{background:var(--reef-dark);color:#fff;position:relative;z-index:30}
+.bar .in{max-width:1240px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.brand img{height:48px;width:auto;display:block}
+.brand span{font-size:14px;opacity:.85;font-weight:700}
+.barR{display:flex;align-items:center;gap:18px;margin-left:auto}
+.dashes{display:flex;gap:4px}
+.dashes i{display:block;width:22px;height:5px}
+/* PrusaSlicer-style mode picker */
+.mode{position:relative}
+.mode>button{font:inherit;font-size:14px;background:#010101;color:#fff;border:1px solid #5A5556;border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.mode>button:hover{border-color:#fff}
+.mode>button .chev{width:12px;height:12px;opacity:.8}
+.mode ul{position:absolute;right:0;top:calc(100% + 6px);margin:0;padding:4px 0;list-style:none;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 28px rgba(0,0,0,.25);min-width:220px}
+.mode li button{font:inherit;font-size:14px;width:100%;background:none;border:0;color:inherit;display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;text-align:left}
+.mode li+li{border-top:1px solid var(--line)}
+.mode li button:hover,.mode li button[aria-checked="true"]{background:var(--bg)}
+.mode li small{display:block;color:var(--muted);font-size:12px}
+.tabsrow{max-width:1240px;margin:0 auto;padding-top:22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+main{max-width:1240px;margin:0 auto;padding-block:14px 40px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:880px){main{grid-template-columns:minmax(0,1fr)}}
+.stagewrap{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px;min-width:0}
+@media (max-width:880px){.stagewrap{position:static}}
+.stage{background:var(--stage);border-radius:6px;padding:18px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:10px;min-height:320px}
+.stage svg{width:100%;height:auto;max-height:62vh;display:block}
+.stage svg.sec{max-height:28vh}
+.stage h3{margin:0;font-family:var(--f-display);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:18px;height:0;border-top:2px solid}
+.sw.dash{border-top-style:dashed}
+.sw.fill{height:10px;border:0}
+.panel{display:flex;flex-direction:column;gap:18px;min-width:0}
+section.grp{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.lbl{font-family:var(--f-display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin:0;display:flex;align-items:center;gap:8px}
+.lbl::before{content:"";width:10px;height:10px;background:var(--c,var(--red))}
+.sub{font-size:13px;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:13px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:7px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sel-fg);border-color:var(--sel)}
+.seg button:hover{border-color:var(--fg)}
+.seg button:disabled{opacity:.4;cursor:not-allowed}
+.seg.big button{font-size:15px;font-weight:700;padding:10px 16px;background:var(--surface)}
+.seg.big button[aria-pressed="true"]{background:var(--sel)}
+.ops{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.ops button{font:inherit;font-size:13px;text-align:left;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:8px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;min-width:0}
+.ops button[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
+.ops button:hover{border-color:var(--fg)}
+.ops button b{font-weight:700}
+.slide{display:grid;grid-template-columns:110px minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:13px}
+.slide span{color:var(--muted)}
+.slide output{font-family:var(--f-mono);font-size:13px;text-align:right}
+input[type=range]{width:100%;accent-color:var(--red)}
+input[type=number]{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 9px;width:110px}
+input:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.chk{display:inline-flex;align-items:flex-start;gap:9px;color:var(--fg);font-size:14px;cursor:pointer;line-height:1.35}
+.chk input{width:18px;height:18px;accent-color:var(--red);margin:0;flex:none}
+.btn{font:inherit;font-weight:700;border-radius:4px;padding:9px 14px;cursor:pointer;border:1px solid transparent}
+.btn.pri{background:var(--yellow);color:#010101}
+.btn.sec{background:transparent;color:var(--fg);border-color:var(--fg)}
+.note{font-size:13px;color:var(--muted);margin:0}
+.warn{background:var(--yellow);color:#010101;border-radius:4px;padding:8px 10px;font-size:13px}
+.ok{background:var(--aqua);color:#010101;border-radius:4px;padding:8px 10px;font-size:13px}
+.dims{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+table.cmp{width:100%;border-collapse:collapse;font-size:13px}
+table.cmp th,table.cmp td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+table.cmp th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+table.cmp tbody tr:hover{background:var(--bg)}
+table.cmp td:first-child{font-weight:700;white-space:nowrap}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.card{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:10px;display:flex;flex-direction:column;gap:2px}
+.card span{font-size:12px;color:var(--muted)}
+.card b{font-family:var(--f-mono);font-size:19px;font-variant-numeric:tabular-nums}
+.card small{font-size:12px;color:var(--muted)}
+.card:hover{border-color:var(--fg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:12px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:4px 10px;cursor:pointer}
+.chip:hover{border-color:var(--fg)}
+ul.plain{margin:0;padding-left:18px;font-size:14px}
+ul.plain li{margin:3px 0}
+.checks{display:flex;flex-direction:column;gap:10px}
+.prog{height:8px;background:var(--bg);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--red);width:0;transition:width .2s}
+/* hover-info */
+[data-info]{cursor:help}
+.term{border-bottom:1px dotted var(--muted)}
+svg [data-info]{transition:filter .12s}
+svg [data-info]:hover,svg [data-info].on{filter:drop-shadow(0 0 3px #05A7E0) drop-shadow(0 0 1px #05A7E0)}
+svg .hit{stroke:transparent;fill:none;stroke-width:9;pointer-events:stroke}
+svg text{font-family:var(--f-body)}
+.tip{position:fixed;z-index:60;max-width:340px;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-left:5px solid var(--lvl);border-radius:6px;padding:10px 12px;box-shadow:0 10px 28px rgba(0,0,0,.22);pointer-events:none;font-size:13px;line-height:1.4}
+.tip h4,#infoCard h4,#opInfo h4{margin:0 0 4px;font-family:var(--f-display);font-size:12px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tip p,#infoCard p,#opInfo p{margin:5px 0}
+.tag{font-family:var(--f-body);font-size:11px;letter-spacing:0;text-transform:none;padding:1px 6px;border-radius:3px;background:var(--fg);color:var(--bg)}
+p.now{font-family:var(--f-mono);font-size:12px;background:var(--bg);padding:5px 7px;border-radius:4px}
+p.more{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.lvp{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+#infoCard{font-size:14px;min-height:5em}
+#infoCard .empty{color:var(--muted);margin:0}
+@media (max-width:480px){.ops{grid-template-columns:minmax(0,1fr)}.slide{grid-template-columns:90px minmax(0,1fr) 56px}}
+@media (prefers-reduced-motion:reduce){svg [data-info]{transition:none}}
+/* level gating */
+body[data-mode="1"] [data-min="2"],body[data-mode="1"] [data-min="3"],body[data-mode="2"] [data-min="3"]{display:none!important}
+</style></head><body data-mode="1">
+
+<header class="bar gut">
+  <div class="in">
+    <div class="brand"><img src="data:image/png;base64,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" width="167" height="96" alt="REEF"><span>Makerspace · CNC Milling Trainer</span></div>
+    <div class="barR">
+      <div class="mode" id="mode">
+        <button type="button" id="modeBtn" aria-haspopup="true" aria-expanded="false"></button>
+        <ul id="modeMenu" role="menu" hidden></ul>
+      </div>
+      <div class="dashes" aria-hidden="true"><i style="background:var(--red)"></i><i style="background:var(--yellow)"></i><i style="background:var(--blue)"></i><i style="background:var(--aqua)"></i></div>
+    </div>
+  </div>
+</header>
+
+<div class="tabsrow gut">
+  <div class="seg big" id="tabSeg" role="tablist" aria-label="Sections">
+    <button type="button" data-v="machines" aria-pressed="true">Machines</button>
+    <button type="button" data-v="tools" aria-pressed="false">Endmills</button>
+    <button type="button" data-v="paths" aria-pressed="false">Toolpaths</button>
+    <button type="button" data-v="feeds" aria-pressed="false">Feeds &amp; Speeds</button>
+    <button type="button" data-v="flow" aria-pressed="false">Workflow &amp; Safety</button>
+  </div>
+  <span class="dims" id="hint">Hover anything highlighted to learn about it · tap on touch screens</span>
+</div>
+
+<main class="gut">
+  <div class="stagewrap">
+    <div class="stage" id="stage"><p class="note">Starting… If this message stays, open this file in Chrome, Edge, or Safari.</p></div>
+    <div class="legend" id="legend"></div>
+    <section class="grp" style="--c:var(--blue)">
+      <h2 class="lbl">Info</h2>
+      <div id="infoCard" aria-live="polite"><p class="empty">Hover over a part of the machine, tool, or toolpath to see what it is and why it matters.</p></div>
+    </section>
+  </div>
+  <div class="panel" id="rail"></div>
+</main>
+<div class="tip" id="tip" hidden></div>
+<script>
+/* ================= EDITABLE DATA =================
+   Machine limits, materials and starting-point numbers live here so REEF staff can tune them.
+   Feeds & speeds are conservative STARTING POINTS for REEF's machines, not guarantees. */
+var MACH = {
+  so: { name: `Shapeoko 5 Pro`, short: `Shapeoko`, cam: `Carbide Create (2D) or Fusion 360`, sender: `Carbide Motion`,
+        // REEF: Carbide 3D 65 mm VFD spindle, 110 V, 1.2 kW, air-cooled, ER-16 collets; RPM set by G-code. Bed: 4 × 4 ft. REEF tools: 1/8″–1/4″.
+        // (If a Compact Router is ever used instead, set rpmMin/Max 11000/31000 and dial: [[1,11000],[2,13500],[3,18250],[4,24500],[5,29250],[6,31000]].)
+        rpmMin: 8000, rpmMax: 24000, dial: null,
+        feedMax: 5000, docK: 1, collets: [3.175, 6.35] },
+  ca: { name: `Carvera Air`, short: `Carvera Air`, cam: `Fusion 360`, sender: `Makera Controller`,
+        rpmMin: 3000, rpmMax: 13000, dial: null, feedMax: 3000, docK: 0.6, collets: [3.175, 6.35] }
+};
+// cl = chipload mm/tooth at [1/8″, 1/4″] (interpolated); doc = slot depth as fraction of D; ad = adaptive width fraction of D
+var MATS = {
+  soft:  { n: `Softwood (pine, poplar)`, cl: [0.045, 0.075], rpm: { so: 18000, ca: 12000 }, doc: 0.5,  ad: 0.15, col: `#E8C99A`, on: [`so`, `ca`] },
+  hard:  { n: `Hardwood (maple, oak, walnut)`, cl: [0.035, 0.055], rpm: { so: 18000, ca: 12000 }, doc: 0.35, ad: 0.12, col: `#C99A62`, on: [`so`, `ca`] },
+  ply:   { n: `Plywood / MDF`, cl: [0.04, 0.0706], rpm: { so: 18000, ca: 12000 }, doc: 0.4, ad: 0.14, col: `#DDBA88`, on: [`so`, `ca`] },
+  hdpe:  { n: `HDPE / acetal (Delrin)`, cl: [0.05, 0.09], rpm: { so: 16000, ca: 11000 }, doc: 0.5, ad: 0.15, col: `#F4F4F0`, on: [`so`, `ca`] },
+  acr:   { n: `Acrylic (cast)`, cl: [0.04, 0.07], rpm: { so: 16000, ca: 11000 }, doc: 0.3, ad: 0.12, col: `#CFE9EE`, on: [`so`, `ca`] },
+  foam:  { n: `Rigid foam (XPS, tooling foam)`, cl: [0.08, 0.15], rpm: { so: 12000, ca: 9000 }, doc: 1.0, ad: 0.3, col: `#F3CBD3`, on: [`so`, `ca`] },
+  al:    { n: `Aluminum 6061`, cl: [0.02, 0.03], rpm: { so: 0, ca: 12000 }, doc: 0.1, ad: 0.08, col: `#C9CDD1`, on: [`ca`] }
+};
+var MODES = [null,
+  { n: `Beginner`, c: `#5DBB46`, d: `Essentials and safety; fewer options` },
+  { n: `Intermediate`, c: `#FCC424`, d: `More toolpaths, parameters and terms` },
+  { n: `Expert`, c: `#B71F34`, d: `Everything, including the math` }];
+
+/* ================= HOVER INFO =================
+   t = title, tag = small badge, b = Beginner text, i = added at Intermediate, e = added at Expert */
+var I = {
+  // ---------- Shapeoko ----------
+  so_frame: { t: `Frame & linear motion`, b: `The rigid base that keeps everything square. A stiff machine makes cleaner cuts.`,
+    i: `The Shapeoko 5 Pro moves on HG-15 linear rails driven by 16 mm ball screws (not belts), so it holds position under cutting load.`,
+    e: `Ball screw accuracy is about ±50 µm per 300 mm; X/Y screws are 20 mm pitch, Z is 10 mm pitch. On router-style machines, frame and gantry stiffness — not spindle power — usually limits how hard you can push.` },
+  so_gantry: { t: `Gantry (X axis)`, b: `The bridge that carries the spindle left–right (X) and rolls front–back (Y). It moves; your material stays still.`,
+    i: `Keep the bed clear of loose clamps, cords, phones, and hands — the gantry moves fast during rapids.`,
+    e: `Deflection grows with Z stick-out. Mount the router as low as practical and use the shortest tool that reaches your depth.` },
+  so_z: { t: `Z axis`, b: `Moves the spindle up and down. Z0 is usually the top of your material.`,
+    i: `+Z is up. A wrong Z zero is the #1 cause of cutting air — or cutting deep into the spoilboard.`,
+    e: `Z is a finer 10 mm-pitch screw for vertical resolution (0.006 mm steps). Keep plunge feed around a third of cutting feed, and ramp when you can.` },
+  so_spindle: { t: `VFD spindle`, tag: `65 mm · 1.2 kW · 110 V`, b: `The motor that spins the endmill. It’s quieter than a router, but cutting is still loud — wear hearing protection.`,
+    i: `Speed (8,000–24,000 RPM) is set by the G-code: Carbide Motion starts the spindle at the RPM from your CAM file. It’s air-cooled — keep the fan vents at the top clear of dust and chips.`,
+    e: `A VFD spindle holds its speed under load and has more torque at low RPM than a trim router, so the feed you calculate is the chipload you get. REEF plywood starting point: 18,000 RPM at 100 in/min (1/4″ 2-flute).` },
+  so_collet: { t: `Collet & nut`, b: `The clamp that grips the endmill shank.`,
+    i: `ER-16 collets: REEF uses 1/8″ and 1/4″ tools. Match the collet to the shank — never shim a tool into the wrong collet.`,
+    e: `Insert at least 3× the shank diameter, keep the collet and taper clean, and don’t bottom the tool out. Runout of even 0.02 mm loads one flute more than the other and wears small tools fast.` },
+  so_bit: { t: `Endmill`, b: `The cutting tool. The Endmills tab covers the flat, ball, and tapered tools REEF uses.`,
+    i: `Make sure the tool you install matches the tool number and size in your CAM file.`,
+    e: `Deflection scales with stick-out³: doubling stick-out makes the tool about 8× more flexible.` },
+  so_waste: { t: `Spoilboard`, tag: `4 × 4 ft bed`, b: `The sacrificial board under your material. It’s okay to cut slightly into it on through-cuts.`,
+    i: `At REEF, material is held by screwing or clamping into the spoilboard — not by locking into the aluminum frame. The spoilboard is surfaced (faced) now and then so it stays flat to the gantry.`,
+    e: `For through-cuts go 0.2–0.5 mm below the stock bottom. Measure stock with calipers — “3/4 in” plywood is often 0.70–0.72 in.` },
+  so_clamps: { t: `Workholding screws & clamps`, b: `Screws or clamps fastened into the spoilboard hold your material so it can’t move or fly loose. Loose stock is dangerous.`,
+    i: `Put screws in waste areas, well outside every toolpath — an endmill that hits a steel screw breaks. Keep clamps below the safe (retract) height, and mark screw spots in CAM if they’re close.`,
+    e: `Screw near the middle of large sheets too, so they stay flat. For thin sheets, painter’s tape + CA glue also works; use tabs or onion-skin passes so parts can’t break free.` },
+  so_stock: { t: `Stock (your material)`, b: `The raw material you’re cutting.`,
+    i: `On the Shapeoko at REEF: wood, plywood, MDF, plastics (HDPE, acetal, acrylic) and foam. Aluminum goes on the Carvera Air.`,
+    e: `Model true thickness in CAM and make the stock box slightly bigger than the real piece — all depths are computed from it.` },
+  so_bitsetter: { t: `BitSetter (tool length sensor)`, b: `A button the tool touches after a tool change, so the machine knows how long the new tool is.`,
+    i: `Carbide Motion uses it automatically at tool changes — you don’t re-zero Z for each tool.`,
+    e: `It stores length relative to the first tool measured. If you re-zero Z afterward, re-measure or the offsets will be wrong.` },
+  so_bitzero: { t: `BitZero (XYZ probe)`, b: `A probe block that finds the corner and top of your material accurately.`,
+    i: `Set it on the front-left corner of the stock, clip the magnet to the collet, and run probing in Carbide Motion.`,
+    e: `Probing assumes a clean, square corner. On rough stock, probe Z on the top and locate X/Y from a fixture or fence instead.` },
+  so_dust: { t: `Dust boot & vacuum`, b: `Sucks up chips and dust. Turn the vacuum on before you start the cut.`,
+    i: `Chips left in a slot get re-cut — that heats the tool and roughens the finish.`,
+    e: `Evacuation matters more as DOC increases. In plastics poor evacuation means melting and chips welding back onto the part.` },
+  so_sw: { t: `Carbide Motion`, tag: `sender`, b: `The program on the computer that runs the Shapeoko: connect, jog, set zero, and send the job.`,
+    i: `Load the .nc file from Carbide Create or Fusion 360, then Initialize → Jog → Zero → Run.`,
+    e: `Use feed-rate override to adjust while cutting; listen for chatter and look at the chips before committing to a long job.` },
+  // ---------- Carvera Air ----------
+  ca_enc: { t: `Enclosure`, b: `Fully enclosed so chips stay inside while you watch through the window.`,
+    i: `Keep the door closed while cutting — it contains aluminum chips and cuts noise.`,
+    e: `The enclosure doesn’t remove fine dust (MDF!). Vacuum chips out after the job.` },
+  ca_window: { t: `Viewing window`, b: `Watch the cut. If anything looks or sounds wrong, pause the job.` },
+  ca_motion: { t: `Motion system`, b: `Moves the spindle in X, Y, and Z inside the box.`,
+    i: `Work area is 300 × 200 × 130 mm — think small, precise parts.`,
+    e: `Small and stiff: great accuracy, but the 200 W spindle limits material removal rate, not the frame.` },
+  ca_spindle: { t: `Spindle (200 W)`, tag: `0–13,000 RPM`, b: `Spins the endmill. Its speed is set by the program — no dial.`,
+    i: `Less power than the Shapeoko’s router, so it takes lighter cuts. It’s accurate for small parts and can cut aluminum.`,
+    e: `Closed-loop speed control up to 13,000 RPM. With 200 W, removal rate (DOC × WOC × feed) is the limit — use adaptive clearing: deep DOC, narrow WOC.` },
+  ca_collet: { t: `Collet & bit collar`, b: `Carvera tools wear a small ring (bit collar) so the machine can grab them the same way every time.`,
+    i: `Ships with a 1/8″ (3.175 mm) collet. 1/4″ tools need the 1/4″ collet <b>and</b> a 1/4″ bit collar.`,
+    e: `Collars set a repeatable stick-out; use the collar installer so tool lengths stay consistent from job to job.` },
+  ca_qtc: { t: `Quick tool change lever`, b: `Flip the lever to release and insert a tool — no wrenches.`,
+    i: `The machine pauses at each tool change in the program and prompts you to swap tools.`,
+    e: `Each new tool is measured automatically, so tool numbers in Fusion must match the physical tools you load.` },
+  ca_tls: { t: `Tool length sensor`, b: `The machine touches the tool here to measure how long it is.`,
+    i: `Runs automatically at tool changes. Keep the top of the sensor free of chips.`,
+    e: `A chip on the sensor makes the tool read long → every cut ends up shallow. Blow it off before long jobs.` },
+  ca_probe: { t: `Probe & auto-leveling`, b: `Finds the edges and top of your material for you.`,
+    i: `Auto-leveling is great for PCBs and shallow engraving on stock that isn’t perfectly flat.`,
+    e: `Leveling probes a grid of points and warps the toolpath Z to match the surface — essential for 0.1 mm-deep engraving.` },
+  ca_bed: { t: `Worktable & clamps`, b: `The bed where material is clamped or taped down.`,
+    i: `Use the clamps or a small vise; keep them out of the toolpath.`,
+    e: `For aluminum, prefer mechanical clamping — tape can release as the part warms.` },
+  ca_stock: { t: `Stock`, b: `Wood, plastics, foam, PCB blanks — and aluminum, brass, or copper.`,
+    i: `Aluminum jobs at REEF go on the Carvera Air, not the Shapeoko.`,
+    e: `6061 machines cleanly; avoid gummy pure aluminum (1100). No steel.` },
+  ca_sw: { t: `Makera Controller`, tag: `sender`, b: `The program that sends your job to the Carvera Air (Wi-Fi or USB).`,
+    i: `Upload the .nc from Fusion 360, set the work origin / probe, then start.`,
+    e: `Post with the Makera Carvera post processor in Fusion so tool changes and probing commands come out correctly.` },
+  ca_addons: { t: `Optional modules`, b: `Extra heads you can add.`, i: `Carvera Air supports an optional 4th-axis rotary and a 5 W laser module.` },
+  // ---------- Endmills ----------
+  em_flat: { t: `Flat endmill`, b: `Square bottom. Cuts flat floors and straight walls — your everyday tool for cutting out parts and pockets.`,
+    i: `Used for Contour, Pocket, Face, and Adaptive. Inside corners come out rounded with radius = tool radius.`,
+    e: `Design inside fillets ≥ tool radius (or add dogbones for square-fitting joints). On 3D surfaces a flat tool leaves visible “stair steps”.` },
+  em_ball: { t: `Ball endmill`, b: `Rounded tip. Makes smooth, curved 3D surfaces and rounded grooves.`,
+    i: `Used for 3D finishing in Fusion (Parallel, Scallop) and for round-bottom channels. Smaller stepover = smoother surface.`,
+    e: `Surface speed is zero at the exact tip, so it rubs on flat areas. Effective diameter at depth a: D<sub>eff</sub> = 2√(a(D−a)).` },
+  em_taper: { t: `Tapered endmill / V-bit`, b: `Pointed (or tiny) tip that widens as it goes deeper. Makes V-grooves, lettering, chamfers, and fine detail.`,
+    i: `Carbide Create’s V-Carve uses a V-bit: going deeper makes the cut wider, so sharp inside corners in text come out crisp. Fusion’s 2D Chamfer bevels edges with it. Tapered ball endmills do fine 3D detail.`,
+    e: `Width at depth d = tip + 2·d·tan(θ/2), θ = included angle. A tapered ball gives you a tiny tip on a strong, thick body — far stiffer than a straight tool with the same tip size.` },
+  em_shank: { t: `Shank`, b: `The smooth part held in the collet. It doesn’t cut.`,
+    i: `Common sizes: 1/8″ (3.175 mm) and 1/4″ (6.35 mm). The shank must match the collet.`,
+    e: `Insert ≥ 3× shank diameter. Reduced-neck tools give reach without long, weak flutes.` },
+  em_flutes: { t: `Flutes`, b: `The spiral grooves with cutting edges. Chips escape up (or down) through them.`,
+    i: `1–2 flutes: lots of chip room → plastics, wood, and aluminum on small machines. 3+ flutes: smoother finish but chips can pack.`,
+    e: `Feed = RPM × flutes × chipload, so flute count changes the feed you need. Single-flute “O-flute” tools are the go-to for plastics.` },
+  em_loc: { t: `Length of cut`, b: `How deep the flutes reach. Never cut deeper than this.`,
+    i: `Longer flutes are weaker and bend more. Choose the shortest tool that reaches your depth.`,
+    e: `Adaptive clearing can use most of the length of cut as DOC because the width of cut is small.` },
+  em_dia: { t: `Cutting diameter (D)`, b: `How wide a cut the tool makes.`,
+    i: `Bigger tools are stronger and faster; smaller tools reach finer detail and tighter corners.`,
+    e: `Stiffness scales with D⁴: a 1/4″ tool is ~16× stiffer than a 1/8″ tool of the same length.` },
+  em_helix: { t: `Helix & cut direction`, b: `The twist of the flutes decides whether chips are pulled up or pushed down.`,
+    i: `<b>Upcut</b> pulls chips up: clean slots, fuzzy top edge, can lift thin parts. <b>Downcut</b> pushes down: clean top edge, but chips pack. <b>Compression</b>: both — clean top and bottom edges on plywood.`,
+    e: `Compression tools only work once the upcut portion is fully in the material — first pass DOC must exceed the upcut length.` },
+  em_tipflat: { t: `Square end`, b: `Flat bottom → flat floors.`, i: `Sharp corners can chip; handle tools by the shank.`,
+    e: `Corner-radius (“bull nose”) tools keep flat floors with stronger corners and better 3D roughing.` },
+  em_tipball: { t: `Ball tip`, b: `A full half-sphere with radius = D/2.`, i: `In Fusion, pick a ball tool for 3D finishing passes after roughing with a flat.`,
+    e: `Scallop height h = R − √(R² − (s/2)²) for stepover s. Halving stepover cuts scallop height ~4×.` },
+  em_tiptaper: { t: `Tip & angle`, b: `The narrow end. The angle sets how fast the cut widens as the tool goes deeper.`,
+    i: `Common V-bits: 60° (deeper, narrower) and 90° (shallower, wider). Tapered endmills use small per-side angles like 3–10°.`,
+    e: `Check whether software wants the <b>included</b> angle or the <b>per-side</b> angle (Fusion uses per-side “taper angle”). Mixing them up doubles the width error.` },
+  em_groove: { t: `Groove profile`, b: `The shape this tool leaves in the material, seen from the end of the cut.`,
+    i: `Flat → square slot. Ball → round “U”. Tapered → “V”.`, e: `Drag the depth slider to see the width the tool actually cuts at that depth.` },
+  em_deff: { t: `Width at this depth`, b: `How wide the cut is at the depth you chose.`,
+    e: `For ball and tapered tools this is less than the full diameter — use it for chipload, stepover and scallop math.` },
+  // ---------- Toolpaths ----------
+  tp_stock: { t: `Stock`, b: `The block of material, seen from above.`, i: `Its size and thickness are set in CAM (Carbide Create: Job Setup; Fusion: Setup → Stock).` },
+  tp_part: { t: `Part geometry`, b: `The shapes you drew. Toolpaths are calculated from these lines.`,
+    i: `Closed shapes are needed for pockets and profiles; open lines can only be followed “on the line”.` },
+  tp_cut: { t: `Cutting move (feed)`, b: `The tool is in the material, moving at the feed rate. Solid red lines.`,
+    i: `The line is the <b>center</b> of the tool — CAM offsets it by the tool radius so the edge lands on your geometry.`,
+    e: `Fusion G1 moves; arcs may be output as G2/G3. Climb vs conventional depends on direction around the shape — the arrows show it.` },
+  tp_rapid: { t: `Rapid move (G0)`, b: `A fast move with the tool lifted up out of the material. Dashed blue lines.`,
+    i: `Rapids happen at the safe/retract height — make sure clamps are below that height!`,
+    e: `Fusion has Clearance, Retract and Feed heights. Set Clearance above clamps and Retract just above the stock to cut air time.` },
+  tp_ramp: { t: `Ramp / helix entry`, b: `The tool eases into the material at an angle instead of drilling straight down.`,
+    i: `Endmills cut poorly straight down. Ramping protects the tool, especially in hardwood and aluminum.`,
+    e: `Typical ramp angle: 2–5° in wood/plastic, 1–2° in aluminum; helical ramp diameter ≈ 1.2× tool diameter or more.` },
+  tp_plunge: { t: `Plunge`, b: `The tool moves straight down into the material.`,
+    i: `Plunge rate is slower than feed (≈ 1/3). Drill and V-carve toolpaths plunge on purpose.`,
+    e: `Peck drilling retracts every few mm to clear chips — use it for holes deeper than ~2× D.` },
+  tp_tab: { t: `Tab (bridge)`, b: `Little bits left uncut so your part stays attached and can’t fly loose at the end.`,
+    i: `Cut the tabs with a flush-cut saw or knife, then sand. Add them in the Contour toolpath (Carbide Create) or the Tabs section of 2D Contour (Fusion).`,
+    e: `Tab height ≈ 1/4–1/3 of thickness; width ≥ 2× tool D in wood. Alternative: onion-skin — leave 0.3 mm and finish with a light final pass.` },
+  tp_lead: { t: `Lead-in / lead-out`, b: `A short approach so the tool doesn’t leave a mark where it starts and stops.`,
+    i: `Fusion adds arc lead-ins automatically in 2D Contour (Linking tab).`, e: `Lead radius ≈ 0.5–1× tool D. Skipping it leaves a witness mark on the wall.` },
+  tp_tool: { t: `Tool position`, b: `The circle shows the size of the tool following the path.`, i: `Press Play to watch the order of moves.` },
+  tp_zero: { t: `Work zero (X0 Y0 Z0)`, b: `The point the machine treats as 0, 0, 0. It must match the origin you chose in CAM.`,
+    i: `Most common: front-left corner, top of stock. Zero the machine at the same spot you picked in CAM.`,
+    e: `Fusion: Setup → WCS orientation and origin (Stock box point). Mixing up Z0 on the stock top vs. the spoilboard is the classic crash.` },
+  tp_step: { t: `Stepover`, b: `How far the tool moves sideways between passes.`,
+    i: `Clearing with a flat endmill: 40–50% of D. Finishing: smaller stepover = smoother surface.`,
+    e: `Ball finishing: scallop h = R − √(R² − (s/2)²). Adaptive uses “optimal load” instead of stepover.` },
+  sec_stock: { t: `Stock (side view)`, b: `A slice through the material so you can see how deep each cut goes.` },
+  sec_spoil: { t: `Spoilboard`, b: `The sacrificial board under the material.`, i: `Through-cuts go a tiny bit into it so the part releases cleanly.` },
+  sec_cut: { t: `Material removed`, b: `The empty area is what this toolpath cuts away.` },
+  sec_pass: { t: `Depth passes (stepdown)`, b: `Deep cuts are done in several shallower layers.`,
+    i: `Each dashed line is one pass. Pass depth depends on tool, material and machine — see Feeds & Speeds.`,
+    e: `Adaptive clearing flips this: one deep pass with a narrow width. Uniform engagement keeps chipload and heat constant.` },
+  // ---------- Operations ----------
+  op_contour: { t: `Contour`, tag: `Carbide Create`, b: `Cuts along a line — usually around the outside of a part to cut it free.`,
+    i: `Choose <b>Outside</b> (parts), <b>Inside</b> (holes), or <b>On the line</b>. Add tabs for through-cuts.`,
+    e: `A final pass leaving 0.2 mm, then a full-depth spring pass, gives cleaner walls on a router. Climb vs conventional changes finish and chatter.` },
+  op_pocket: { t: `Pocket`, tag: `Carbide Create`, b: `Clears all the material inside a shape down to a set depth.`,
+    i: `Stepover ≈ 40%. Depth is measured from the top of the stock (Z0).`,
+    e: `Offset pockets bury the tool at full width on the first pass — lower DOC there, or use Fusion Adaptive for deep pockets.` },
+  op_vcarve: { t: `V-Carve`, tag: `Carbide Create`, b: `A V-bit carves letters and shapes, going deeper where the shape is wider.`,
+    i: `Perfect for signs. The point reaches into sharp corners, so text stays crisp. Wide areas can be flat-cleared with a second “pocket” tool.`,
+    e: `Max depth = (width/2) / tan(θ/2). Set a Max Depth for flat-bottom V-carving plus a clearing tool for wide letters.` },
+  op_drill: { t: `Drill`, tag: `Carbide Create`, b: `Plunges straight down to make holes the same size as the tool.`,
+    i: `For holes bigger than the tool, use Contour (Inside) or Pocket instead.`,
+    e: `Endmills aren’t drills: low plunge feed and peck to clear chips in deep holes.` },
+  op_face: { t: `Face`, tag: `Fusion 360`, b: `Skims the top of the stock flat and clean.`,
+    i: `Run it first so your Z0 surface is flat. Shallow depth, big tool.`,
+    e: `60–75% stepover with a large flat tool and a small DOC. Same operation surfaces a spoilboard.` },
+  op_contour2d: { t: `2D Contour`, tag: `Fusion 360`, b: `Follows the edge of your model to cut the part out or finish walls.`,
+    i: `Select the bottom edge chain; Fusion picks the side. Add Tabs and Multiple Depths for through-cuts.`,
+    e: `Use Stock to Leave on roughing passes and a separate finishing contour; arc lead-in/out avoids witness marks.` },
+  op_pocket2d: { t: `2D Pocket`, tag: `Fusion 360`, b: `Clears inside a shape, layer by layer.`,
+    i: `Fusion ramps in with a helix by default. Choose Multiple Depths for the layer size.`,
+    e: `For deep or hard-material pockets, Adaptive is usually faster and kinder to the tool — especially on the Carvera Air.` },
+  op_adaptive: { t: `2D Adaptive Clearing`, tag: `Fusion 360`, b: `Smart pocket clearing: looping moves keep the load on the tool steady.`,
+    i: `Lets small machines cut deep with a narrow width — faster, cooler, and longer tool life. Great on the Carvera Air.`,
+    e: `Optimal load ≈ 10–15% D (≈ 8% in aluminum on the Carvera Air), DOC up to 2–3× D. Leave 0.2–0.3 mm stock and finish with Contour/Pocket.` },
+  op_bore: { t: `Bore (helical)`, tag: `Fusion 360`, b: `Spirals down to cut a round hole bigger than the tool.`,
+    i: `Select the hole’s cylinder face; Fusion makes the helix. Works for any hole larger than the tool.`,
+    e: `Keep pitch per revolution small (≈ 0.3–0.5 mm in aluminum). Add a finishing pass for accurate press-fit sizes.` },
+  op_chamfer: { t: `2D Chamfer`, tag: `Fusion 360`, b: `Bevels sharp edges with a V-bit / chamfer tool.`,
+    i: `Select the edge and set chamfer width. The tool tip runs slightly below the edge so the bevel is clean.`,
+    e: `Tip offset keeps the fragile point out of the cut; set it ~0.2–0.5 mm. Needs a tool with a correct taper angle in the library.` },
+  op_parallel: { t: `3D Parallel finishing`, tag: `Fusion 360`, b: `Back-and-forth lines over a curved 3D shape with a ball endmill for a smooth surface.`,
+    i: `Rough first (3D Adaptive with a flat), then finish with Parallel. Smaller stepover = smoother, but slower.`,
+    e: `Parallel works best on shallow slopes; steep walls get wide scallops — combine with Contour or use Scallop/Steep & Shallow.` },
+  // ---------- Feeds & speeds ----------
+  fs_rpm: { t: `Spindle speed (RPM)`, b: `How fast the tool spins.`,
+    i: `Too fast with too little feed rubs and burns; too slow with too much feed overloads the tool.`,
+    e: `RPM and feed are linked by chipload. Pick RPM within the machine’s range first, then compute feed.` },
+  fs_dial: { t: `Router dial setting`, b: `The Compact Router speed is set by hand. Turn the dial to this number before you start.` },
+  fs_feed: { t: `Feed rate`, b: `How fast the tool moves through the material.`,
+    i: `Feed = RPM × flutes × chipload.`, e: `With chip thinning compensation applied for narrow cuts (adaptive / finishing).` },
+  fs_plunge: { t: `Plunge rate`, b: `How fast the tool moves down into the material.`,
+    i: `About one third of the feed. Ramp instead of plunging when you can.`, e: `Aluminum: ¼ of feed and ramp at 1–2°.` },
+  fs_doc: { t: `Depth of cut (DOC)`, b: `How deep each pass goes.`,
+    i: `Also called “stepdown” or “pass depth”. Full-width slots need the shallowest passes.`,
+    e: `Adaptive: deep DOC (≈ 1–2× D) with small width. The Carvera Air gets lighter cuts than the Shapeoko in wood and plastic.` },
+  fs_woc: { t: `Width of cut / stepover`, b: `How much of the tool’s side is cutting.`,
+    i: `Slot = 100%. Pocket = ~40%. Adaptive = ~10–15%. Finishing = small.`, e: `Narrow width thins the chips — see the chip-thinning factor.` },
+  fs_chip: { t: `Chipload`, b: `The thickness of the chip each cutting edge takes. Good chips = sharp tool, clean cut, no burning.`,
+    i: `Wood should make chips, not dust. Fine dust = chipload too small (rubbing).`, e: `Interpolated by tool diameter from the REEF material table at the top of this file.` },
+  fs_mrr: { t: `Material removal rate`, b: `How much material is removed per minute.`, e: `MRR = DOC × WOC × feed. On the 200 W Carvera Air this is the real limit.` },
+  fs_ctf: { t: `Chip-thinning factor`, b: `When only a sliver of the tool engages, chips get thinner than the feed suggests.`,
+    e: `RCTF = 1/√(1 − (1 − 2·ae/D)²) for ae &lt; D/2. Feed is multiplied by this (capped at 2×) to restore the target chipload.` },
+  fs_deff: { t: `Effective diameter`, b: `A ball or V tool cutting shallow is really a smaller tool.`, e: `Ball: D<sub>eff</sub> = 2√(a(D−a)). Lower D<sub>eff</sub> → lower surface speed at the same RPM.` },
+  fs_scallop: { t: `Scallop height`, b: `The tiny ridges a ball endmill leaves between passes.`, e: `h = R − √(R² − (s/2)²).` },
+  fs_mat: { t: `Material`, b: `The material being cut — this sets chipload, speed and depth.` },
+  fs_tool: { t: `Endmill in the cut`, b: `Side view of the tool engaged in the material.` },
+  fs_rot: { t: `Rotation`, b: `Spindles turn clockwise (looking down). The cutting edges meet the material as the tool moves.` },
+  fs_dir: { t: `Feed direction`, b: `The direction the tool is travelling.`, i: `Climb milling: the cutter rotation and travel go the same way at the cut. Conventional: opposite.` },
+  fs_top: { t: `Top view of engagement`, b: `Seen from above: the shaded area is the part of the tool that’s cutting.` }
+};
+</script>
+<script>
+window.addEventListener("error", function (e) {
+  var st = document.getElementById("stage");
+  if (st && !st.querySelector("svg")) st.innerHTML = '<p class="note">The tool couldn\'t start (' + String(e && e.message || "script error").replace(/[<>&]/g, "") + '). Try Chrome, Edge or Safari, or tell REEF staff what this says.</p>';
+});
+</script>
+<script>
+(function () {
+"use strict";
+/* ---------------- state ---------------- */
+var LS = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+           set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+var S = {
+  mode: +(LS.get("reefcnc.mode") || 1), tab: LS.get("reefcnc.tab") || "machines",
+  mach: "so", labels: true, helpMat: "ply",
+  tool: "flat", dia: 3.175, flutes: 2, cutdir: "up", taper: 0, depth: 0.8,
+  sw: "cc", op: "contour", stepover: 40, stepdown: 3, tabs: true, climb: true, speed: 3,
+  f: { m: "so", mat: "ply", tool: "flat", dia: 6.35, fl: 2, strat: "slot", units: "in", cl: "" },
+  flow: "so_cc", checks: {}
+};
+if (!(S.mode >= 1 && S.mode <= 3)) S.mode = 1;
+var TABS = ["machines", "tools", "paths", "feeds", "flow"];
+if (TABS.indexOf(S.tab) < 0) S.tab = "machines";
+
+var $ = function (id) { return document.getElementById(id); };
+var stage = $("stage"), rail = $("rail"), legend = $("legend"), tip = $("tip"), card = $("infoCard");
+function hex(c, s) { s = s || 16; return '<svg viewBox="0 0 20 20" width="' + s + '" height="' + s + '" aria-hidden="true" style="flex:none"><path d="M10 1.3 17.6 5.65v8.7L10 18.7 2.4 14.35v-8.7Z" fill="' + c + '"/></svg>'; }
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function r2(v) { return Math.round(v * 100) / 100; }
+function frac(mm) { var m = { 1.5875: `1/16″`, 3.175: `1/8″`, 6.35: `1/4″`, 12.7: `1/2″` }; return m[mm] || r2(mm) + " mm"; }
+
+/* ---------------- hover info ---------------- */
+function infoHTML(key, extra) {
+  var d = I[key]; if (!d) return "";
+  var h = "<h4>" + d.t + (d.tag ? '<span class="tag">' + d.tag + "</span>" : "") + "</h4>";
+  var parts = [d.b, S.mode >= 2 ? d.i : null, S.mode >= 3 ? d.e : null].filter(Boolean);
+  if (!parts.length) parts = [d.i || d.e || ""];
+  h += parts.map(function (p) { return "<p>" + p + "</p>"; }).join("");
+  if (extra) h += '<p class="now">' + extra + "</p>";
+  var more = S.mode === 1 ? (d.i || d.e) : S.mode === 2 ? d.e : null;
+  if (more) h += '<p class="more">' + hex(MODES[S.mode + 1].c, 12) + " More detail in " + MODES[S.mode + 1].n + " mode</p>";
+  return h;
+}
+var curEl = null;
+function showCard(el) {
+  document.querySelectorAll("svg .on").forEach(function (n) { n.classList.remove("on"); });
+  card.innerHTML = infoHTML(el.getAttribute("data-info"), el.getAttribute("data-extra"));
+}
+document.addEventListener("pointermove", function (e) {
+  if (e.pointerType === "touch") return;
+  var el = e.target && e.target.closest ? e.target.closest("[data-info]") : null;
+  if (!el) { tip.hidden = true; curEl = null; return; }
+  if (el !== curEl) { curEl = el; tip.innerHTML = infoHTML(el.getAttribute("data-info"), el.getAttribute("data-extra")); showCard(el); }
+  tip.hidden = false;
+  var w = tip.offsetWidth, h = tip.offsetHeight, x = e.clientX + 16, y = e.clientY + 16;
+  if (x + w > window.innerWidth - 8) x = e.clientX - w - 12;
+  if (y + h > window.innerHeight - 8) y = e.clientY - h - 12;
+  tip.style.left = Math.max(8, x) + "px"; tip.style.top = Math.max(8, y) + "px";
+});
+document.addEventListener("click", function (e) {
+  var el = e.target.closest && e.target.closest("[data-info]");
+  if (el && !e.target.closest("button,input,label")) { showCard(el); el.classList.add("on"); }
+});
+document.addEventListener("focusin", function (e) { var el = e.target.closest && e.target.closest("[data-info]"); if (el) showCard(el); });
+window.addEventListener("scroll", function () { tip.hidden = true; curEl = null; }, { passive: true });
+
+/* ---------------- mode picker ---------------- */
+var modeBtn = $("modeBtn"), modeMenu = $("modeMenu");
+function drawMode() {
+  var m = MODES[S.mode];
+  modeBtn.innerHTML = hex(m.c, 18) + m.n + ' mode <svg class="chev" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#fff" stroke-width="1.6" fill="none"/></svg>';
+  modeMenu.innerHTML = [1, 2, 3].map(function (i) {
+    return '<li role="none"><button type="button" role="menuitemradio" aria-checked="' + (i === S.mode) + '" data-mode="' + i + '">' + hex(MODES[i].c, 18) +
+      '<span>' + MODES[i].n + ' mode<small>' + MODES[i].d + '</small></span></button></li>';
+  }).join("");
+  document.body.setAttribute("data-mode", S.mode);
+  document.documentElement.style.setProperty("--lvl", m.c);
+}
+modeBtn.addEventListener("click", function (e) { e.stopPropagation(); var o = modeMenu.hidden; modeMenu.hidden = !o; modeBtn.setAttribute("aria-expanded", o); });
+modeMenu.addEventListener("click", function (e) {
+  var b = e.target.closest("[data-mode]"); if (!b) return;
+  S.mode = +b.getAttribute("data-mode"); LS.set("reefcnc.mode", S.mode);
+  modeMenu.hidden = true; modeBtn.setAttribute("aria-expanded", "false"); drawMode(); render();
+});
+document.addEventListener("click", function () { if (!modeMenu.hidden) { modeMenu.hidden = true; modeBtn.setAttribute("aria-expanded", "false"); } });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") { modeMenu.hidden = true; tip.hidden = true; } });
+
+/* ---------------- tabs + generic controls ---------------- */
+$("tabSeg").addEventListener("click", function (e) {
+  var b = e.target.closest("button"); if (!b) return; S.tab = b.getAttribute("data-v"); LS.set("reefcnc.tab", S.tab); render();
+});
+function setPath(path, v) { var p = path.split("."), o = S; while (p.length > 1) o = o[p.shift()]; o[p[0]] = v; }
+function getPath(path) { var p = path.split("."), o = S; while (p.length) o = o[p.shift()]; return o; }
+function seg(path, opts, extraAttr) {
+  var cur = getPath(path);
+  return '<div class="seg" role="group">' + opts.map(function (o) {
+    return '<button type="button" data-set="' + path + '" data-v="' + o[0] + '" aria-pressed="' + (String(cur) === String(o[0])) + '"' +
+      (o[2] ? ' data-min="' + o[2] + '"' : "") + (o[3] ? " disabled" : "") + (o[4] ? ' data-info="' + o[4] + '"' : "") + ">" + o[1] + "</button>";
+  }).join("") + "</div>";
+}
+function parseV(v) { return /^-?\d+(\.\d+)?$/.test(v) ? +v : v === "true" ? true : v === "false" ? false : v; }
+rail.addEventListener("click", function (e) {
+  var b = e.target.closest("[data-set]");
+  if (b && b.tagName === "BUTTON") { var pk = b.getAttribute("data-set"); setPath(pk, parseV(b.getAttribute("data-v"))); if (pk === "tool" || pk === "dia" || pk === "taper") S.depth = S.tool === "taper" ? (S.taper === 2 ? 1.5 : 3) : r2(S.dia / 2); fixState(); render(); return; }
+  var g = e.target.closest("[data-go]");
+  if (g) { var a = g.getAttribute("data-go").split(":"); S.tab = "paths"; S.sw = a[0]; S.op = a[1]; LS.set("reefcnc.tab", S.tab); render(); }
+});
+rail.addEventListener("change", function (e) {
+  var t = e.target;
+  if (t.type === "checkbox" && t.hasAttribute("data-set")) { setPath(t.getAttribute("data-set"), t.checked); render(); }
+  else if (t.type === "checkbox" && t.hasAttribute("data-chk")) { S.checks[S.flow + t.getAttribute("data-chk")] = t.checked; updateProg(); }
+  else if (t.type === "number" && t.hasAttribute("data-set")) { setPath(t.getAttribute("data-set"), t.value); render(); }
+});
+rail.addEventListener("input", function (e) {
+  var t = e.target; if (t.type !== "range") return;
+  setPath(t.getAttribute("data-set"), +t.value);
+  var o = t.parentNode.querySelector("output"); if (o) o.textContent = t.value + (t.getAttribute("data-u") || "");
+  renderStage();
+});
+function fixState() {
+  if (MACH[S.f.m] && MATS[S.f.mat].on.indexOf(S.f.m) < 0) S.f.mat = "ply";
+  if (S.f.tool === "taper") S.f.strat = "slot";
+  if (S.f.dia > 6.35) S.f.dia = 6.35; if (S.f.dia < 3.175) S.f.dia = 3.175; if (S.dia < 3.175) S.dia = 3.175;
+  if (S.mode < 2 && S.f.strat !== "slot") S.f.strat = "slot";
+  var op = OPS[S.op];
+  if (!op || op.sw !== S.sw || op.lv > S.mode) S.op = Object.keys(OPS).filter(function (k) { return OPS[k].sw === S.sw && OPS[k].lv <= S.mode; })[0];
+}
+
+/* ================= MACHINES ================= */
+var TXT = 'style="fill:var(--fg);stroke:var(--stage);stroke-width:4px;paint-order:stroke;font-size:13px;font-weight:700"';
+function labels(list) {
+  if (!S.labels) return "";
+  return list.map(function (l) {
+    return '<g data-info="' + l[0] + '"' + (l[6] ? ' data-min="' + l[6] + '"' : "") + '><line x1="' + l[2] + '" y1="' + l[3] + '" x2="' + l[4] + '" y2="' + (l[5] + 4) + '" style="stroke:var(--fg);stroke-width:1"/><circle cx="' + l[2] + '" cy="' + l[3] + '" r="2.5" style="fill:var(--fg)"/>' +
+      '<text x="' + l[4] + '" y="' + l[5] + '" text-anchor="' + (l[7] || "middle") + '" ' + TXT + ">" + l[1] + "</text></g>";
+  }).join("");
+}
+function shapeokoSVG() {
+  var tt = "";
+  for (var i = 0; i < 6; i++) { var a = 78 + (i + 0.5) / 6 * 484, b = 36 + (i + 0.5) / 6 * 568; tt += '<line x1="' + a + '" y1="297" x2="' + b + '" y2="363" stroke="#BCA67C" stroke-width="1"/>'; }
+  return '<svg viewBox="0 0 640 430" role="img" aria-label="Shapeoko 5 Pro diagram (schematic)">' +
+    '<ellipse cx="320" cy="404" rx="300" ry="12" style="fill:rgba(0,0,0,.08)"/>' +
+    '<g data-info="so_waste" tabindex="0"><polygon points="78,296 562,296 604,364 36,364" fill="#CDB892" stroke="#8A6A3E"/>' + tt + "</g>" +
+    '<g data-info="so_frame" tabindex="0"><polygon points="62,290 78,290 36,370 18,370" fill="#231F20"/><polygon points="562,290 578,290 622,370 604,370" fill="#231F20"/><rect x="14" y="364" width="612" height="16" fill="#231F20"/><rect x="62" y="284" width="516" height="8" fill="#231F20"/></g>' +
+    '<g data-info="so_bitsetter" tabindex="0"><rect x="88" y="322" width="24" height="18" fill="#8A9095" stroke="#424143"/><ellipse cx="100" cy="322" rx="12" ry="4" fill="#B5BBC0" stroke="#424143"/></g>' +
+    '<g data-info="so_stock" tabindex="0"><polygon points="210,300 440,300 452,322 198,322" fill="#E8C99A" stroke="#8A6A3E"/><rect x="198" y="322" width="254" height="10" fill="#C9A16A" stroke="#8A6A3E"/><path d="M230 306 Q300 302 420 308 M222 314 Q320 310 436 316" stroke="#C9A16A" fill="none"/></g>' +
+    '<g data-info="so_clamps" tabindex="0"><circle cx="220" cy="304" r="4" fill="#8A9095" stroke="#424143"/><circle cx="430" cy="304" r="4" fill="#8A9095" stroke="#424143"/><circle cx="212" cy="317" r="4" fill="#8A9095" stroke="#424143"/><circle cx="392" cy="317" r="4" fill="#8A9095" stroke="#424143"/></g>' +
+    '<g data-info="so_bitzero" tabindex="0"><rect x="404" y="306" width="22" height="12" fill="#231F20"/><rect x="404" y="317" width="22" height="4" fill="#B71F34"/></g>' +
+    '<g data-info="so_gantry" tabindex="0"><rect x="44" y="150" width="38" height="180" fill="#424143"/><rect x="558" y="150" width="38" height="180" fill="#424143"/><rect x="44" y="150" width="552" height="48" fill="#231F20"/><rect x="60" y="160" width="520" height="5" fill="#8A9095"/><rect x="60" y="184" width="520" height="5" fill="#8A9095"/></g>' +
+    '<g data-info="so_z" tabindex="0"><rect x="292" y="102" width="66" height="18" fill="#424143"/><rect x="282" y="118" width="86" height="128" rx="4" fill="#5A5F63" stroke="#231F20"/></g>' +
+    '<g data-info="so_spindle" tabindex="0"><rect x="297" y="126" width="56" height="132" rx="8" fill="#D7DBDE" stroke="#424143"/><rect x="297" y="146" width="56" height="7" fill="#05A7E0"/><rect x="289" y="176" width="72" height="20" rx="3" fill="#8A9095"/><circle cx="338" cy="136" r="5" fill="#B5BBC0"/></g>' +
+    '<g data-info="so_dust" tabindex="0"><path d="M353 270 C 430 262, 440 120, 486 92" stroke="#424143" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M298 262 h54 l6 32 h-66 z" fill="rgba(5,167,224,.14)" stroke="#05A7E0" stroke-dasharray="3 3"/></g>' +
+    '<g data-info="so_collet" tabindex="0"><polygon points="309,256 341,256 335,272 315,272" fill="#B5BBC0" stroke="#424143"/></g>' +
+    '<g data-info="so_bit" tabindex="0"><rect x="321" y="272" width="8" height="29" fill="#9AA0A6" stroke="#424143"/><path d="M321 280 l8 -4 M321 288 l8 -4 M321 296 l8 -4" stroke="#424143"/></g>' +
+    '<g data-info="so_sw" tabindex="0"><rect x="528" y="382" width="60" height="34" rx="3" fill="#231F20"/><rect x="533" y="386" width="50" height="25" fill="#05A7E0"/><polygon points="520,416 596,416 604,426 512,426" fill="#424143"/></g>' +
+    labels([["so_gantry", "Gantry (X)", 150, 172, 150, 128], ["so_spindle", "VFD spindle", 300, 140, 230, 84, 0, "end"], ["so_z", "Z axis", 366, 124, 420, 84, 0, "start"],
+      ["so_collet", "Collet", 310, 262, 270, 244, 0, "end"], ["so_bit", "Endmill", 321, 290, 270, 276, 0, "end"], ["so_dust", "Dust boot", 486, 92, 500, 64, 0, "start"],
+      ["so_stock", "Stock", 300, 320, 300, 404], ["so_clamps", "Screws", 212, 317, 170, 404], ["so_bitsetter", "BitSetter", 100, 322, 96, 250, 0, "start"],
+      ["so_bitzero", "BitZero", 415, 318, 470, 346, 0, "start"], ["so_waste", "Spoilboard", 130, 350, 60, 404], ["so_sw", "Carbide Motion", 528, 400, 506, 404, 0, "end"]]) + "</svg>";
+}
+function carveraSVG() {
+  var holes = ""; for (var i = 0; i < 9; i++) holes += '<circle cx="' + (186 + i * 34) + '" cy="292" r="2.5" fill="#424143"/>';
+  return '<svg viewBox="0 0 640 430" role="img" aria-label="Carvera Air diagram (schematic)">' +
+    '<ellipse cx="320" cy="396" rx="250" ry="12" style="fill:rgba(0,0,0,.08)"/>' +
+    '<g data-info="ca_enc" tabindex="0"><rect x="130" y="36" width="380" height="326" rx="12" fill="#3A3536"/><rect x="130" y="352" width="380" height="30" rx="6" fill="#231F20"/><rect x="150" y="362" width="60" height="6" fill="#05A7E0"/></g>' +
+    '<g data-info="ca_window" tabindex="0"><rect x="158" y="62" width="324" height="264" rx="8" fill="#E6F4F6" stroke="#7DCFD8" stroke-width="3"/></g>' +
+    '<g data-info="ca_motion" tabindex="0"><rect x="168" y="84" width="304" height="24" fill="#5A5F63"/><rect x="168" y="92" width="304" height="4" fill="#B5BBC0"/></g>' +
+    '<g data-info="ca_bed" tabindex="0"><rect x="172" y="280" width="296" height="24" fill="#8A9095" stroke="#424143"/>' + holes + '<rect x="230" y="252" width="22" height="8" rx="2" fill="#424143"/><rect x="388" y="252" width="22" height="8" rx="2" fill="#424143"/></g>' +
+    '<g data-info="ca_stock" tabindex="0"><rect x="246" y="258" width="148" height="22" fill="#C9CDD1" stroke="#5A5F63"/><path d="M252 266 h136 M252 273 h136" stroke="#E3E6E8"/></g>' +
+    '<g data-info="ca_tls" tabindex="0"><rect x="186" y="263" width="20" height="17" fill="#424143"/><rect x="186" y="258" width="20" height="5" fill="#05A7E0"/></g>' +
+    '<g data-info="ca_probe" tabindex="0"><rect x="430" y="236" width="10" height="34" rx="2" fill="#424143"/><circle cx="435" cy="274" r="4.5" fill="#B71F34"/></g>' +
+    '<g data-info="ca_spindle" tabindex="0"><rect x="288" y="104" width="64" height="104" rx="5" fill="#231F20"/><rect x="288" y="120" width="64" height="6" fill="#05A7E0"/></g>' +
+    '<g data-info="ca_qtc" tabindex="0"><path d="M352 136 L386 120" stroke="#FCC424" stroke-width="8" stroke-linecap="round"/><circle cx="388" cy="119" r="7" fill="#FCC424" stroke="#231F20"/></g>' +
+    '<g data-info="ca_collet" tabindex="0"><polygon points="304,208 336,208 331,222 309,222" fill="#B5BBC0" stroke="#424143"/><rect x="311" y="222" width="18" height="6" fill="#B71F34"/></g>' +
+    '<g data-info="so_bit" tabindex="0"><rect x="316" y="228" width="8" height="29" fill="#9AA0A6" stroke="#424143"/><path d="M316 236 l8 -4 M316 244 l8 -4 M316 252 l8 -4" stroke="#424143"/></g>' +
+    '<g data-info="ca_sw" tabindex="0"><rect x="528" y="300" width="72" height="52" rx="6" fill="#231F20"/><rect x="534" y="306" width="60" height="40" rx="2" fill="#05A7E0"/></g>' +
+    '<g data-info="ca_addons" data-min="2" tabindex="0"><rect x="30" y="250" width="64" height="40" rx="4" fill="#424143"/><path d="M62 290 v26" stroke="#B71F34" stroke-width="3" stroke-dasharray="4 3"/><text x="62" y="240" text-anchor="middle" ' + TXT + '>Add-ons</text></g>' +
+    labels([["ca_enc", "Enclosure", 136, 50, 66, 30, 0, "middle"], ["ca_spindle", "Spindle 200 W", 290, 160, 250, 150, 0, "end"], ["ca_qtc", "Quick-change lever", 390, 119, 400, 80, 0, "start"],
+      ["ca_collet", "Collet + collar", 336, 214, 400, 206, 0, "start"], ["ca_tls", "Tool length sensor", 196, 258, 166, 238, 0, "start"], ["ca_probe", "Probe", 440, 240, 452, 222, 0, "start"],
+      ["ca_stock", "Aluminum stock", 330, 278, 340, 318, 0, "start"], ["ca_bed", "Worktable", 220, 298, 176, 318, 0, "start"], ["ca_sw", "Makera Controller", 564, 300, 564, 290, 0, "middle"]]) + "</svg>";
+}
+var CMP = [
+  ["Best for", "Bigger parts in wood, plastic and foam: signs, furniture parts, panels", "Small, precise parts; aluminum; PCBs; engraving", 1],
+  ["Materials", "Wood, plywood, MDF, plastics, foam", "All of those plus aluminum, brass, copper", 1],
+  ["Work area", "4 × 4 ft bed", "300 × 200 × 130 mm", 1],
+  ["Workholding", "Screws or clamps into the spoilboard", "Clamps or vise on the worktable", 1],
+  ["CAM", "Carbide Create (2D) · Fusion 360 (everything else)", "Fusion 360", 1],
+  ["Runs from", "Carbide Motion", "Makera Controller", 1],
+  ["Enclosure", "Open frame — stay clear, wear hearing protection", "Enclosed with window", 1],
+  ["Spindle", "65 mm 1.2 kW VFD (110 V, air-cooled), 8,000–24,000 RPM, set by program", "200 W, 0–13,000 RPM, set by program", 2],
+  ["Collets", "ER-16: 1/8″ and 1/4″", "1/8″ standard; 1/4″ with collet + bit collar", 2],
+  ["Tool change", "Manual wrench change + BitSetter length check", "Lever quick-change + automatic length measurement", 2],
+  ["Probing", "BitZero XYZ probe", "Auto probing and surface leveling", 2],
+  ["Motion", "Ball screws + HG-15 linear rails, ±50 µm / 300 mm", "Compact, stiff desktop gantry", 3],
+  ["Practical limit", "Rigidity / stick-out → chatter", "Spindle power (200 W) → use adaptive", 3]
+];
+var machines = {
+  stage: function () { return '<h3>' + MACH[S.mach].name + ' · schematic, not to scale</h3>' + (S.mach === "so" ? shapeokoSVG() : carveraSVG()); },
+  legend: function () { return '<span>' + hex(MODES[S.mode].c, 14) + 'Highlighted parts glow when you hover them</span>'; },
+  rail: function () {
+    var mats = Object.keys(MATS), hm = MATS[S.helpMat], res;
+    if (S.helpMat === "al") res = `<b>Carvera Air only.</b> Aluminum stays off the Shapeoko at REEF.`;
+    else if (S.helpMat === "foam") res = `<b>Either.</b> Shapeoko for big foam molds and signs; Carvera Air for small models (watch the 130 mm Z height).`;
+    else res = `<b>Either.</b> Use the Shapeoko for anything bigger than about 300 × 200 mm or for sheet goods; use the Carvera Air for small, precise parts.`;
+    return '<section class="grp"><h2 class="lbl">Machine</h2>' + seg("mach", [["so", "Shapeoko 5 Pro"], ["ca", "Carvera Air"]]) +
+      '<label class="chk"><input type="checkbox" data-set="labels"' + (S.labels ? " checked" : "") + '> Show part labels</label>' +
+      '<p class="note">' + (S.mach === "so" ? `Open-frame CNC router for wood, plastic and foam. CAM: Carbide Create for 2D, Fusion 360 for 3D.` : `Enclosed desktop mill for small parts — wood, plastic, foam and aluminum. CAM: Fusion 360.`) + "</p></section>" +
+      '<section class="grp" style="--c:var(--yellow)"><h2 class="lbl">Compare</h2><table class="cmp"><thead><tr><th></th><th>Shapeoko 5 Pro</th><th>Carvera Air</th></tr></thead><tbody>' +
+      CMP.map(function (r) { return '<tr data-min="' + r[3] + '"><td>' + r[0] + "</td><td>" + r[1] + "</td><td>" + r[2] + "</td></tr>"; }).join("") + "</tbody></table></section>" +
+      '<section class="grp" style="--c:var(--blue)"><h2 class="lbl">Which machine?</h2><p class="sub">Pick your material:</p>' +
+      seg("helpMat", mats.map(function (k) { return [k, MATS[k].n.split(" (")[0]]; })) + '<p class="' + (S.helpMat === "al" ? "warn" : "ok") + '" style="margin:0">' + res + "</p></section>";
+  }
+};
+
+/* ================= ENDMILLS ================= */
+var TAPERS = [{ n: `60° V-bit`, incl: 60, tip: 0, ball: false, shank: 6.35 }, { n: `90° V-bit`, incl: 90, tip: 0, ball: false, shank: 6.35 },
+  { n: `Tapered ball 0.5 mm · 3.6°/side`, incl: 7.2, tip: 0.5, ball: true, shank: 3.175 }];
+function widthAt(a) {
+  if (S.tool === "flat") return S.dia;
+  if (S.tool === "ball") { var R = S.dia / 2; return a >= R ? S.dia : 2 * Math.sqrt(a * (S.dia - a)); }
+  var t = TAPERS[S.taper], h = t.incl / 2 * Math.PI / 180, R0 = t.tip / 2;
+  if (t.ball && a < R0) return 2 * Math.sqrt(a * (t.tip - a));
+  return Math.min(t.shank, t.tip + 2 * (a - (t.ball ? R0 : 0)) * Math.tan(h) + (t.ball ? 0 : 0));
+}
+function toolSVG() {
+  var cx = 150, yT = 380, s = "", t = TAPERS[S.taper], shR = 50, yF, flute, tipShape, tipKey, angLbl = "";
+  var dir = S.tool === "flat" ? S.cutdir : "up";
+  if (S.tool === "taper") {
+    var tipR = Math.max(t.tip ? 6 : 0, 50 * t.tip / t.shank), h = t.incl / 2 * Math.PI / 180;
+    var len = Math.min(190, (50 - tipR) / Math.tan(h)); yF = yT - len;
+    flute = t.ball ? "M" + (cx - 50) + " " + yF + " L" + (cx - tipR) + " " + (yT - tipR) + " A" + tipR + " " + tipR + " 0 0 0 " + (cx + tipR) + " " + (yT - tipR) + " L" + (cx + 50) + " " + yF + " Z"
+                   : "M" + (cx - 50) + " " + yF + " L" + cx + " " + yT + " L" + (cx + 50) + " " + yF + " Z";
+    tipShape = '<circle cx="' + cx + '" cy="' + (yT - 8) + '" r="16" style="fill:rgba(0,0,0,.001)"/>'; tipKey = "em_tiptaper";
+    angLbl = '<g data-info="em_tiptaper"><path d="M' + cx + ' ' + (yT + 6) + ' v40" style="stroke:var(--muted)" stroke-dasharray="3 3"/><text x="' + (cx + 80) + '" y="' + (yT + 2) + '" text-anchor="start" ' + TXT + '>' + (t.ball ? t.incl / 2 + "°/side" : t.incl + "° incl.") + (t.tip ? " · tip " + t.tip + " mm" : "") + "</text></g>" +
+      (len >= 190 && t.ball ? '<text x="' + (cx - 60) + '" y="' + (yF + 20) + '" text-anchor="end" style="fill:var(--muted);font-size:11px">angle exaggerated</text>' : "");
+  } else {
+    if (S.dia < 3.175) shR = 80;
+    yF = shR > 50 ? 225 : 200;
+    flute = S.tool === "flat" ? "M" + (cx - 50) + " " + yF + " V" + yT + " H" + (cx + 50) + " V" + yF + " Z"
+          : "M" + (cx - 50) + " " + yF + " V" + (yT - 50) + " A50 50 0 0 0 " + (cx + 50) + " " + (yT - 50) + " V" + yF + " Z";
+    tipShape = S.tool === "flat" ? '<rect x="' + (cx - 52) + '" y="' + (yT - 14) + '" width="104" height="18" style="fill:rgba(0,0,0,.001)"/>'
+             : '<path d="M' + (cx - 50) + " " + (yT - 50) + " A50 50 0 0 0 " + (cx + 50) + " " + (yT - 50) + 'Z" style="fill:rgba(0,0,0,.001)"/>';
+    tipKey = S.tool === "flat" ? "em_tipflat" : "em_tipball";
+  }
+  var shBottom = S.tool === "taper" ? yF : (shR > 50 ? 205 : 200);
+  s += '<defs><clipPath id="flc"><path d="' + flute + '"/></clipPath></defs>';
+  s += '<g data-info="em_shank" tabindex="0"><rect x="' + (cx - shR) + '" y="20" width="' + 2 * shR + '" height="' + (shBottom - 20) + '" rx="4" fill="#C9CDD1" stroke="#424143"/>' +
+    (shR > 50 ? '<path d="M' + (cx - shR) + ' 205 L' + (cx - 50) + ' 225 H' + (cx + 50) + ' L' + (cx + shR) + ' 205 Z" fill="#C9CDD1" stroke="#424143"/>' : "") + "</g>";
+  var stripes = "", sp = 64 / S.flutes, mid = (yF + yT) / 2;
+  for (var y = yF - 120; y < yT + 120; y += sp) {
+    var d = dir === "down" ? -1 : 1;
+    if (dir === "comp") d = y > mid ? 1 : -1;
+    stripes += '<line x1="' + (cx - 70) + '" y1="' + (y + 35 * d) + '" x2="' + (cx + 70) + '" y2="' + (y - 35 * d) + '"/>';
+  }
+  s += '<g data-info="em_flutes" tabindex="0"><path d="' + flute + '" fill="#B5BBC0" stroke="#424143"/><g clip-path="url(#flc)" stroke="#424143" stroke-opacity=".55" stroke-width="' + (S.flutes === 1 ? 12 : 8) + '">' + stripes + '</g><path d="' + flute + '" fill="none" stroke="#424143" stroke-width="1.5"/></g>';
+  s += '<g data-info="' + tipKey + '" tabindex="0">' + tipShape + "</g>" + angLbl;
+  // dimensions
+  s += '<g data-info="em_loc" tabindex="0"><path d="M' + (cx + 70) + " " + yF + " v" + (yT - yF) + " M" + (cx + 64) + " " + yF + " h12 M" + (cx + 64) + " " + yT + ' h12" style="stroke:var(--fg)"/><text x="' + (cx + 80) + '" y="' + (mid + 4) + '" text-anchor="start" ' + TXT + ">Length of cut</text></g>";
+  s += '<g data-info="em_shank"><text x="' + (cx + shR + 12) + '" y="110" text-anchor="start" ' + TXT + ">Shank " + (S.tool === "taper" ? frac(t.shank) : (S.dia < 3.175 ? "1/8″" : frac(S.dia))) + "</text></g>";
+  if (S.tool !== "taper") s += '<g data-info="em_dia" tabindex="0"><path d="M' + (cx - 50) + " 420 h100 M" + (cx - 50) + " 414 v12 M" + (cx + 50) + ' 414 v12" style="stroke:var(--fg)"/><text x="' + cx + '" y="444" text-anchor="middle" ' + TXT + ">D = " + frac(S.dia) + "</text></g>";
+  else s += '<g data-info="em_dia"><text x="' + cx + '" y="444" text-anchor="middle" ' + TXT + ">" + t.n + "</text></g>";
+  s += '<g data-info="em_helix" data-min="2" tabindex="0"><text x="' + (cx - 64) + '" y="' + (mid + 4) + '" text-anchor="end" ' + TXT + ">" + { up: "Upcut ↑", down: "Downcut ↓", comp: "Compression ↕" }[dir] + "</text></g>";
+  // groove: the tool profile pushed into the material to a depth (expert: the depth slider)
+  var gx = 460, gt = 130, gd = 90, k, maxA;
+  if (S.tool === "taper") { k = (S.taper === 2 ? 40 : 20); maxA = S.taper === 2 ? 3 : 6; gd = 100; } else { k = 100 / S.dia; maxA = S.dia; }
+  var Dmm = S.mode >= 3 ? clamp(S.depth, 0.05, maxA) : gd / k, tipY = gt + Dmm * k, L = [], Rr = [];
+  for (var j = 0; j <= 40; j++) { var hh = Dmm * j / 40, wv = widthAt(hh) * k / 2; L.push(r2(gx - wv) + "," + r2(tipY - hh * k)); Rr.unshift(r2(gx + wv) + "," + r2(tipY - hh * k)); }
+  var groove = "M" + L.join(" L") + " L" + Rr.join(" L") + " Z";
+  s += '<g data-info="em_groove" tabindex="0"><rect x="340" y="' + gt + '" width="240" height="190" fill="#E8C99A" stroke="#8A6A3E"/><path d="' + groove + '" style="fill:var(--stage)" stroke="#8A6A3E"/></g>';
+  s += '<text x="460" y="' + (gt - 40) + '" text-anchor="middle" ' + TXT + '>Groove it leaves (end view)</text>';
+  if (S.mode >= 3) {
+    var w = widthAt(Dmm), wp = w * k;
+    s += '<g data-info="em_deff" data-extra="depth ' + r2(Dmm) + ' mm → width ' + r2(w) + ' mm" tabindex="0"><path d="M' + r2(gx - wp / 2) + " " + (gt - 4) + " H" + r2(gx + wp / 2) + '" stroke="#B71F34" stroke-width="4"/>' +
+      '<path d="M590 ' + gt + " V" + tipY + '" stroke="#B71F34" stroke-width="2"/><text x="460" y="' + (gt + 190 + 26) + '" text-anchor="middle" ' + TXT + ">width " + r2(w) + " mm @ depth " + r2(Dmm) + " mm</text></g>";
+  }
+  return '<svg viewBox="0 0 600 460" role="img" aria-label="Endmill diagram">' + s + "</svg>";
+}
+var GOOD = {
+  flat: { g: ["Cutting parts out (Contour)", "Pockets and flat floors", "Facing stock flat", "Adaptive roughing"], a: ["Smooth curved 3D surfaces", "Sharp inside corners (impossible — radius = D/2)"],
+          go: [["cc:contour", "Contour"], ["cc:pocket", "Pocket"], ["f:face", "Face"], ["f:adaptive", "2D Adaptive"]] },
+  ball: { g: ["3D finishing of curved surfaces", "Round-bottom grooves and fillets"], a: ["Flat floors (leaves scallops)", "Cutting parts out"], go: [["f:parallel", "3D Parallel"]] },
+  taper: { g: ["V-carved signs and lettering", "Chamfering edges", "Fine 3D detail (tapered ball)"], a: ["Deep, wide pockets", "Cutting parts out"], go: [["cc:vcarve", "V-Carve"], ["f:chamfer", "2D Chamfer"]] }
+};
+var tools = {
+  stage: function () { return '<h3>' + { flat: "Flat endmill", ball: "Ball endmill", taper: "Tapered endmill / V-bit" }[S.tool] + " · side view</h3>" + toolSVG(); },
+  legend: function () { return '<span><i class="sw fill" style="background:#B5BBC0"></i>Cutting flutes</span><span><i class="sw fill" style="background:#C9CDD1;outline:1px solid #424143"></i>Shank</span><span><i class="sw fill" style="background:#E8C99A"></i>Material</span>'; },
+  rail: function () {
+    var g = GOOD[S.tool];
+    var maxA = S.tool === "taper" ? (S.taper === 2 ? 3 : 6) : S.dia;
+    return '<section class="grp"><h2 class="lbl">Endmill</h2>' +
+      seg("tool", [["flat", "Flat", 0, 0, "em_flat"], ["ball", "Ball", 0, 0, "em_ball"], ["taper", "Tapered / V-bit", 0, 0, "em_taper"]]) +
+      '<p class="note">' + I["em_" + S.tool].b + "</p>" +
+      (S.tool === "taper" ? '<div class="sub">Type</div>' + seg("taper", TAPERS.map(function (t, i) { return [i, t.n, i === 2 ? 2 : 0]; }))
+        : '<div class="sub">Diameter</div>' + seg("dia", [[3.175, "1/8″"], [6.35, "1/4″"]])) +
+      '<div data-min="2"><div class="sub" style="margin-bottom:6px"><span class="term" data-info="em_flutes">Flutes</span></div>' + seg("flutes", [[1, "1 (O-flute)"], [2, "2"], [3, "3"]]) + "</div>" +
+      (S.tool === "flat" ? '<div data-min="2"><div class="sub" style="margin-bottom:6px"><span class="term" data-info="em_helix">Cut direction</span></div>' + seg("cutdir", [["up", "Upcut"], ["down", "Downcut"], ["comp", "Compression"]]) + "</div>" : "") +
+      '<div class="slide" data-min="3"><span class="term" data-info="em_deff">Depth</span><input type="range" data-set="depth" data-u=" mm" min="0.05" max="' + maxA + '" step="0.05" value="' + clamp(S.depth, 0.05, maxA) + '"><output>' + clamp(S.depth, 0.05, maxA) + " mm</output></div></section>" +
+      '<section class="grp" style="--c:var(--yellow)"><h2 class="lbl">Good for</h2><ul class="plain">' + g.g.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>" +
+      '<div class="sub">Avoid</div><ul class="plain">' + g.a.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>" +
+      '<div class="sub">See it in a toolpath</div><div class="chips">' + g.go.map(function (x) { var lv = OPS[x[0].split(":")[1]].lv; return '<button type="button" class="chip" data-go="' + x[0] + '"' + (lv > 1 ? ' data-min="' + lv + '"' : "") + ">" + x[1] + " →</button>"; }).join("") + "</div></section>" +
+      '<section class="grp" style="--c:var(--blue)" data-min="2"><h2 class="lbl">Tool tips</h2><ul class="plain"><li>Store tools in their tubes; carbide edges chip if they knock together.</li><li>Measure the real diameter with calipers and enter it in your CAM tool library.</li><li>REEF tools run from 1/8″ to 1/4″. Shapeoko: ER-16 collets. Carvera Air: 1/8″ standard; 1/4″ needs the 1/4″ collet and bit collar.</li></ul></section>';
+  }
+};
+
+/* ================= TOOLPATHS ================= */
+var OPS = {
+  contour:  { sw: "cc", lv: 1, n: "Contour",   tool: { t: "flat", D: 3.175 }, use: ["tabs", "sd"] },
+  pocket:   { sw: "cc", lv: 1, n: "Pocket",    tool: { t: "flat", D: 3.175 }, use: ["so", "sd"] },
+  vcarve:   { sw: "cc", lv: 1, n: "V-Carve",   tool: { t: "v", D: 6.35, incl: 90 }, use: [] },
+  drill:    { sw: "cc", lv: 2, n: "Drill",     tool: { t: "flat", D: 6.35 }, use: ["sd"] },
+  face:     { sw: "f", lv: 1, n: "Face",       tool: { t: "flat", D: 6.35 }, use: ["so"] },
+  contour2d:{ sw: "f", lv: 1, n: "2D Contour", tool: { t: "flat", D: 3.175 }, use: ["tabs", "sd"] },
+  pocket2d: { sw: "f", lv: 1, n: "2D Pocket",  tool: { t: "flat", D: 3.175 }, use: ["so", "sd"] },
+  adaptive: { sw: "f", lv: 2, n: "2D Adaptive", tool: { t: "flat", D: 3.175 }, use: [] },
+  bore:     { sw: "f", lv: 2, n: "Bore",       tool: { t: "flat", D: 3.175 }, use: [] },
+  chamfer:  { sw: "f", lv: 2, n: "2D Chamfer", tool: { t: "v", D: 6.35, incl: 90 }, use: [] },
+  parallel: { sw: "f", lv: 3, n: "3D Parallel", tool: { t: "ball", D: 3.175 }, use: ["so"] }
+};
+var HOME = [-4, -4], OUT = [60, 40, 100, 60, 8], POC = [32, 40, 36, 26, 4], CTR = [72, 40], HOLES = [[99, 22], [99, 58]];
+function X(x) { return 30 + x * 4.5; } function Y(y) { return 20 + y * 4.5; }
+function rr(cx, cy, w, h, r, n) {
+  if (w <= 0.01 || h <= 0.01) return null; r = Math.max(0, Math.min(r, w / 2, h / 2)); n = n || 6;
+  var x0 = cx - w / 2, x1 = cx + w / 2, y0 = cy - h / 2, y1 = cy + h / 2, p = [[x0, cy]];
+  function arc(ax, ay, a0, a1) { for (var i = 0; i <= n; i++) { var a = a0 + (a1 - a0) * i / n; p.push([ax + r * Math.cos(a), ay + r * Math.sin(a)]); } }
+  arc(x0 + r, y0 + r, Math.PI, 1.5 * Math.PI); arc(x1 - r, y0 + r, 1.5 * Math.PI, 2 * Math.PI);
+  arc(x1 - r, y1 - r, 0, 0.5 * Math.PI); arc(x0 + r, y1 - r, 0.5 * Math.PI, Math.PI); p.push([x0, cy]);
+  return p;
+}
+function circ(cx, cy, r, n) { var p = []; n = n || 32; for (var i = 0; i <= n; i++) { var a = Math.PI + i / n * 2 * Math.PI; p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return p; }
+function cum(p) { var c = [0]; for (var i = 1; i < p.length; i++) c.push(c[i - 1] + Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1])); return c; }
+function at(p, c, s) { for (var i = 1; i < p.length; i++) if (c[i] >= s) { var t = (s - c[i - 1]) / ((c[i] - c[i - 1]) || 1); return [p[i - 1][0] + (p[i][0] - p[i - 1][0]) * t, p[i - 1][1] + (p[i][1] - p[i - 1][1]) * t]; } return p[p.length - 1].slice(); }
+function slice(p, c, s0, s1) { var o = [at(p, c, s0)]; for (var i = 0; i < p.length; i++) if (c[i] > s0 && c[i] < s1) o.push(p[i]); o.push(at(p, c, s1)); return o; }
+function star(R, r) { var p = []; for (var i = 0; i <= 10; i++) { var a = -Math.PI / 2 + i * Math.PI / 5, q = i % 2 ? r : R; p.push([CTR[0] + q * Math.cos(a), CTR[1] + q * Math.sin(a)]); } return p; }
+function loopWithTabs(segs, loop, rampLen) {
+  var c = cum(loop), L = c[c.length - 1], s = 0;
+  if (rampLen) { segs.push({ k: "ramp", p: slice(loop, c, 0, rampLen) }); s = rampLen; }
+  if (S.tabs && S.mode >= 1) {
+    [0.125, 0.375, 0.625, 0.875].forEach(function (f) {
+      var m = f * L, w = 5;
+      if (m - w / 2 > s) segs.push({ k: "cut", p: slice(loop, c, s, m - w / 2) });
+      segs.push({ k: "tab", p: slice(loop, c, m - w / 2, m + w / 2) }); s = m + w / 2;
+    });
+  }
+  segs.push({ k: "cut", p: slice(loop, c, s, L) });
+}
+function rev(p) { return p.slice().reverse(); }
+function pocketRings(D, step) {
+  var rings = [], k = 0, o;
+  while (true) { o = D / 2 + k * step; var ring = rr(POC[0], POC[1], POC[2] - 2 * o, POC[3] - 2 * o, POC[4] - o, 6); if (!ring) break; rings.push(S.climb ? rev(ring) : ring); k++; if (k > 40) break; }
+  return rings.reverse();
+}
+function build(opk) {
+  var op = OPS[opk], D = op.tool.D, segs = [], last = HOME, so = S.stepover / 100 * D;
+  function rapid(to) { segs.push({ k: "rapid", p: [last, to] }); last = to; }
+  function add(k, p) { segs.push({ k: k, p: p }); last = p[p.length - 1]; }
+  if (opk === "contour" || opk === "contour2d") {
+    var o = rr(OUT[0], OUT[1], OUT[2] + D, OUT[3] + D, OUT[4] + D / 2, 8); if (!S.climb) o = rev(o);
+    var st = o[0], ls = [st[0] - 5, st[1] + (S.climb ? 5 : -5)];
+    rapid(ls);
+    if (opk === "contour2d") { var lp = []; for (var i = 0; i <= 8; i++) { var a = Math.PI / 2 * i / 8; lp.push([st[0] - 5 + 5 * Math.sin(a), st[1] + (S.climb ? 1 : -1) * 5 * Math.cos(a)]); } add("lead", lp); }
+    else add("lead", [ls, st]);
+    loopWithTabs(segs, o, opk === "contour" ? 15 : 0); last = st;
+    add("lead", [st, [st[0] - 5, st[1] + (S.climb ? -5 : 5)]]); rapid(HOME);
+  } else if (opk === "pocket" || opk === "pocket2d") {
+    var rings = pocketRings(D, Math.max(so, 0.3)), cl = [[POC[0] + 5, POC[1]], [POC[0] - 5, POC[1]]];
+    rapid([POC[0], POC[1]]);
+    if (opk === "pocket2d") add("ramp", circ(POC[0], POC[1], 0.6 * D, 20)); else add("ramp", [[POC[0], POC[1]], [POC[0] + 5, POC[1]]]);
+    add("cut", [last, cl[1]]);
+    rings.forEach(function (r) { add("cut", [last, r[0]]); add("cut", r); });
+    rapid(HOME);
+  } else if (opk === "vcarve") {
+    var sp = star(14, 6);
+    for (var t = 0; t < 10; t += 2) { rapid(sp[t]); add("plunge", [sp[t]]); add("cut", [sp[t], CTR]); add("cut", [CTR, sp[t]]); }
+    rapid(HOME);
+  } else if (opk === "drill") {
+    HOLES.forEach(function (h) { rapid(h); add("plunge", [h]); }); rapid(HOME);
+  } else if (opk === "bore") {
+    HOLES.forEach(function (h) { var c = circ(h[0], h[1], (6.35 - D) / 2, 24); rapid([h[0], h[1]]); add("ramp", [[h[0], h[1]], c[0]].concat(c)); add("cut", c); }); rapid(HOME);
+  } else if (opk === "face") {
+    var x0 = -D / 2 - 3, x1 = 120 + D / 2 + 3, y = D * 0.25, dirF = 1, pts = [];
+    while (y <= 80 - D * 0.25 + so * 0.99) { var yy = Math.min(y, 80 - D * 0.25); pts.push(dirF > 0 ? [x0, yy] : [x1, yy], dirF > 0 ? [x1, yy] : [x0, yy]); dirF = -dirF; y += Math.max(so, 0.5); }
+    rapid(pts[0]); add("cut", pts); rapid(HOME);
+  } else if (opk === "adaptive") {
+    var rg = pocketRings(D, 0.5 * D), lr = 0.35 * D, adv = 0.35 * D;
+    rapid([POC[0], POC[1]]); add("ramp", circ(POC[0], POC[1], 0.6 * D, 20));
+    var paths = [[[POC[0] + 5, POC[1]], [POC[0] - 5, POC[1]]]].concat(rg), out = [];
+    paths.forEach(function (p) {
+      var c = cum(p), L = c[c.length - 1], n = Math.ceil(L / adv * 8);
+      for (var j = 0; j <= n; j++) { var s = j / 8 * adv, q = at(p, c, Math.min(s, L)), th = j / 8 * 2 * Math.PI; out.push([q[0] + lr * Math.cos(th), q[1] - lr * Math.sin(th)]); }
+    });
+    add("cut", out); rapid(HOME);
+  } else if (opk === "chamfer") {
+    var oc = rr(OUT[0], OUT[1], OUT[2] + 1, OUT[3] + 1, OUT[4] + 0.5, 8);
+    rapid([oc[0][0] - 4, oc[0][1] + 4]); add("lead", [last, oc[0]]); add("cut", oc); rapid(HOME);
+  } else if (opk === "parallel") {
+    var R = 14 + D / 2, stp = Math.max(so, 0.3), ys = CTR[1] - R, pp = [], dd = 1;
+    for (var yv = ys; yv <= CTR[1] + R + 1e-6; yv += stp) { var hx = Math.sqrt(Math.max(0, R * R - Math.pow(yv - CTR[1], 2))) + 1.5; pp.push(dd > 0 ? [CTR[0] - hx, yv] : [CTR[0] + hx, yv], dd > 0 ? [CTR[0] + hx, yv] : [CTR[0] - hx, yv]); dd = -dd; }
+    rapid(pp[0]); add("plunge", [pp[0]]); add("cut", pp); rapid(HOME);
+  }
+  return segs;
+}
+var KCOL = { cut: "#B71F34", rapid: "#05A7E0", ramp: "#F15B29", lead: "#7A7F84", tab: "#010101", plunge: "#F15B29" };
+function ptsStr(p) { return p.map(function (q) { return r2(X(q[0])) + "," + r2(Y(q[1])); }).join(" "); }
+function arrows(p) {
+  var c = cum(p), L = c[c.length - 1], o = "";
+  if (L < 18) return "";
+  var n = Math.min(4, Math.floor(L / 60) + 1);
+  for (var i = 1; i <= n; i++) {
+    var s = L * i / (n + 1), a = at(p, c, s), b = at(p, c, Math.min(L, s + 0.5)), ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+    o += '<path d="M-5 -4 L4 0 L-5 4 Z" fill="#B71F34" transform="translate(' + r2(X(a[0])) + "," + r2(Y(a[1])) + ") rotate(" + r2(ang) + ')"/>';
+  }
+  return o;
+}
+var CUR = { segs: [], flat: [], cw: [] };
+function topSVG() {
+  var opk = S.op, op = OPS[opk], fus = S.sw === "f", segs = build(opk), s = "";
+  s += '<defs><radialGradient id="dome" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#F6E3C2"/><stop offset="1" stop-color="#B98F57"/></radialGradient></defs>';
+  s += '<g data-info="tp_stock"><rect x="' + X(0) + '" y="' + Y(0) + '" width="540" height="360" fill="#E8C99A" stroke="#8A6A3E"/>';
+  for (var g = 0; g < 9; g++) s += '<path d="M' + X(0) + " " + (Y(4 + g * 9)) + " q 135 " + (g % 2 ? 8 : -8) + " 270 0 t 270 0" + '" stroke="#D7B27C" fill="none"/>';
+  s += "</g>";
+  var dim = 'stroke="#6B4A2B" stroke-width="1.5"';
+  s += '<g data-info="tp_part"><polygon points="' + ptsStr(rr.apply(null, OUT)) + '" fill="none" ' + dim + '/><polygon points="' + ptsStr(rr.apply(null, POC)) + '" fill="rgba(107,74,43,.12)" ' + dim + "/>";
+  HOLES.forEach(function (h) { s += '<circle cx="' + X(h[0]) + '" cy="' + Y(h[1]) + '" r="' + 3.175 * 4.5 + '" fill="rgba(107,74,43,.12)" ' + dim + "/>"; });
+  s += fus ? '<circle cx="' + X(CTR[0]) + '" cy="' + Y(CTR[1]) + '" r="' + 14 * 4.5 + '" fill="url(#dome)" ' + dim + "/>" : '<polygon points="' + ptsStr(star(14, 6)) + '" fill="rgba(107,74,43,.18)" ' + dim + "/>";
+  s += "</g>";
+  // zero
+  s += '<g data-info="tp_zero" tabindex="0"><circle cx="' + X(0) + '" cy="' + Y(80) + '" r="7" fill="#FCC424" stroke="#010101" stroke-width="1.5"/><path d="M' + X(0) + " " + Y(80) + " h40 M" + X(0) + " " + Y(80) + ' v-40" stroke="#010101" stroke-width="2"/><text x="' + (X(0) + 44) + '" y="' + (Y(80) + 4) + '" style="font-size:12px;font-weight:700;fill:#010101">X</text><text x="' + (X(0) - 4) + '" y="' + (Y(80) - 46) + '" style="font-size:12px;font-weight:700;fill:#010101">Y</text></g>';
+  // toolpath
+  var hitW = 9;
+  segs.forEach(function (sg) {
+    var col = KCOL[sg.k];
+    if (sg.k === "plunge") { var q = sg.p[0]; s += '<g data-info="tp_plunge"><circle cx="' + X(q[0]) + '" cy="' + Y(q[1]) + '" r="5" fill="none" stroke="' + col + '" stroke-width="2"/><path d="M' + (X(q[0]) - 3.5) + " " + (Y(q[1]) - 3.5) + " l7 7 m0 -7 l-7 7" + '" stroke="' + col + '" stroke-width="1.5"/></g>'; return; }
+    var w = sg.k === "tab" ? 5 : sg.k === "rapid" ? 1.4 : 1.6, dash = sg.k === "rapid" ? ' stroke-dasharray="5 4"' : sg.k === "ramp" ? ' stroke-dasharray="2 2"' : "";
+    var pts = ptsStr(sg.p);
+    s += '<g data-info="tp_' + sg.k + '"><polyline points="' + pts + '" fill="none" stroke="' + col + '" stroke-width="' + w + '"' + dash + ' stroke-linejoin="round"/><polyline class="hit" points="' + pts + '" style="stroke-width:' + hitW + 'px"/>' + (sg.k === "cut" && opk !== "adaptive" && opk !== "face" && opk !== "parallel" ? arrows(sg.p) : "") + "</g>";
+  });
+  // animation layers
+  var tr = op.tool.t === "v" ? 3 : op.tool.D / 2 * 4.5;
+  s += '<polyline id="trail" fill="none" stroke="#010101" stroke-opacity=".35" stroke-width="' + Math.max(2, tr * 2) + '" stroke-linecap="round" stroke-linejoin="round" points=""/>';
+  s += '<g data-info="tp_tool"><circle id="toolMk" cx="' + X(HOME[0]) + '" cy="' + Y(HOME[1]) + '" r="' + Math.max(4, tr) + '" fill="rgba(252,196,36,.75)" stroke="#010101" stroke-width="1.5"/></g>';
+  // flatten for animation
+  var flat = [], cw = [0];
+  segs.forEach(function (sg) { sg.p.forEach(function (q) { flat.push({ x: q[0], y: q[1], k: sg.k }); }); });
+  for (var i = 1; i < flat.length; i++) { var dd = Math.hypot(flat[i].x - flat[i - 1].x, flat[i].y - flat[i - 1].y); cw.push(cw[i - 1] + dd * (flat[i].k === "rapid" ? 0.25 : 1) + (flat[i].k === "plunge" ? 6 : 0)); }
+  CUR = { flat: flat, cw: cw, segs: segs };
+  return '<svg viewBox="0 0 600 400" role="img" aria-label="Toolpath top view">' + s + "</svg>";
+}
+function secSVG() {
+  var opk = S.op, op = OPS[opk], D = op.tool.D, fus = S.sw === "f", sx = 4.5, zs = 4, ds = S.stepdown;
+  function SX(x) { return 30 + x * sx; } function SZ(z) { return 24 + z * zs; }
+  var T = 12, regs = [];
+  if (opk === "contour" || opk === "contour2d") regs = [[10 - D, 10, 12.3], [110, 110 + D, 12.3]];
+  else if (opk === "pocket" || opk === "pocket2d" || opk === "adaptive") regs = [[14, 50, 4]];
+  else if (opk === "drill" || opk === "bore") regs = [[99 - 3.175, 99 + 3.175, 12.3]];
+  else if (opk === "face") regs = [[0, 120, 0.5]];
+  var s = '<g data-info="sec_spoil"><rect x="10" y="' + SZ(T) + '" width="580" height="20" fill="#CDB892" stroke="#8A6A3E"/></g>';
+  s += '<g data-info="sec_stock"><rect x="' + SX(0) + '" y="' + SZ(0) + '" width="' + 120 * sx + '" height="' + T * zs + '" fill="#E8C99A" stroke="#8A6A3E"/></g>';
+  var cut = "", passes = "", extra = "";
+  regs.forEach(function (r) {
+    cut += '<rect x="' + SX(r[0]) + '" y="' + (SZ(0) - 1) + '" width="' + (r[1] - r[0]) * sx + '" height="' + (r[2] * zs + 1) + '" style="fill:var(--stage)" stroke="#8A6A3E" stroke-dasharray="2 2"/>';
+    var n = opk === "adaptive" || opk === "face" ? 1 : Math.ceil(r[2] / ds);
+    extra = n + (n === 1 ? " pass" : " passes") + " · " + (opk === "adaptive" ? "full depth " + r[2] + " mm in one step" : r2(r[2] / n) + " mm each");
+    for (var k = 1; k < n; k++) passes += '<path d="M' + SX(r[0]) + " " + SZ(r[2] * k / n) + " H" + SX(r[1]) + '" stroke="#B71F34" stroke-dasharray="4 3"/>';
+    if ((opk === "contour" || opk === "contour2d") && S.tabs) cut += '<g data-info="tp_tab"><rect x="' + SX(r[0]) + '" y="' + SZ(T - 3) + '" width="' + (r[1] - r[0]) * sx + '" height="' + 3 * zs + '" fill="#C9A16A" stroke="#010101"/></g>';
+    if (opk === "bore") { var zz = ""; for (var b = 0; b <= 10; b++) zz += (b ? " L" : "M") + SX(b % 2 ? r[1] - 0.4 : r[0] + 0.4) + " " + SZ(b * 1.2); passes += '<path d="' + zz + '" stroke="#F15B29" fill="none"/>'; }
+    if (opk === "drill") passes += '<path d="M' + SX(99) + " " + SZ(0) + " V" + SZ(4) + " M" + (SX(99) - 6) + " " + SZ(4) + " h12 M" + (SX(99) - 6) + " " + SZ(8) + ' h12" stroke="#F15B29"/>';
+  });
+  if (opk === "vcarve") { var hw = 6; cut += '<polygon points="' + SX(72 - hw) + "," + SZ(0) + " " + SX(72 + hw) + "," + SZ(0) + " " + SX(72) + "," + SZ(hw) + '" style="fill:var(--stage)" stroke="#8A6A3E"/>'; extra = "depth = half the shape’s width (90° bit) · deepest at the center"; }
+  if (opk === "chamfer") { [10, 110].forEach(function (x) { var d = x < 60 ? 1 : -1; cut += '<polygon points="' + SX(x) + "," + SZ(1.2) + " " + SX(x) + "," + SZ(0) + " " + SX(x + d * 1.2) + "," + SZ(0) + '" style="fill:var(--stage)" stroke="#8A6A3E"/>'; }); cut += '<rect x="10" y="' + (SZ(0) - 1) + '" width="' + (SX(10) - 10) + '" height="' + (T * zs + 1) + '" style="fill:var(--stage)"/><rect x="' + SX(110) + '" y="' + (SZ(0) - 1) + '" width="' + (590 - SX(110)) + '" height="' + (T * zs + 1) + '" style="fill:var(--stage)"/>'; extra = "edge bevel after the part is cut out"; }
+  if (opk === "parallel") {
+    var pts = [SX(56) + "," + (SZ(0) - 1)];
+    for (var x = 56; x <= 88.01; x += 1) { var u = (x - 72) / 16, z = x < 58 || x > 86 ? 6 : 6 * Math.pow((x - 72) / 14, 2); pts.push(SX(x) + "," + SZ(z)); }
+    pts.push(SX(88) + "," + (SZ(0) - 1));
+    cut += '<polygon points="' + pts.join(" ") + '" style="fill:var(--stage)" stroke="#8A6A3E"/>'; extra = "dome finished after roughing · ridges = scallops";
+  }
+  s += '<g data-info="sec_cut">' + cut + "</g>" + (passes ? '<g data-info="sec_pass" data-extra="' + extra + '">' + passes + '<path d="M0 0" /></g>' : "");
+  // tool silhouette
+  var tx = regs.length ? (regs[0][0] + regs[0][1]) / 2 : 72, tz = regs.length ? regs[0][2] : (opk === "chamfer" ? 1.2 : 6);
+  if (opk === "chamfer") tx = 10; if (opk === "parallel") { tx = 68; tz = 6 * Math.pow(4 / 14, 2); }
+  var w = D * sx, yb = SZ(tz), tool;
+  if (op.tool.t === "v") { var hh = (D / 2) * zs / Math.tan(op.tool.incl / 2 * Math.PI / 180) * (sx / zs); tool = '<polygon points="' + (SX(tx) - w / 2) + "," + (yb - w / 2) + " " + (SX(tx) + w / 2) + "," + (yb - w / 2) + " " + SX(tx) + "," + yb + '" fill="#9AA0A6" stroke="#424143"/><rect x="' + (SX(tx) - w / 2) + '" y="0" width="' + w + '" height="' + (yb - w / 2) + '" fill="#C9CDD1" stroke="#424143"/>'; }
+  else if (op.tool.t === "ball") tool = '<path d="M' + (SX(tx) - w / 2) + " 0 V" + (yb - w / 2) + " A" + w / 2 + " " + w / 2 + " 0 0 0 " + (SX(tx) + w / 2) + " " + (yb - w / 2) + ' V0 Z" fill="#9AA0A6" stroke="#424143"/>';
+  else tool = '<rect x="' + (SX(tx) - w / 2) + '" y="0" width="' + w + '" height="' + yb + '" fill="#9AA0A6" stroke="#424143"/>';
+  s += '<g data-info="tp_tool" opacity=".9">' + tool + "</g>";
+  return '<svg class="sec" viewBox="0 0 600 120" role="img" aria-label="Side section">' + s + "</svg>" + (extra ? '<p class="note" style="margin:0">' + extra + "</p>" : "");
+}
+/* animation */
+var A = { on: false, d: 0, i: 0, t0: 0, raf: 0, trail: [] };
+function animReset() { cancelAnimationFrame(A.raf); A.on = false; A.d = 0; A.i = 0; A.trail = []; var b = $("playBtn"); if (b) b.textContent = "▶ Play"; }
+function animStep(ts) {
+  if (!A.on) return;
+  var dt = Math.min(0.05, (ts - (A.t0 || ts)) / 1000); A.t0 = ts;
+  A.d += dt * 12 * S.speed;
+  var F = CUR.flat, C = CUR.cw, mk = $("toolMk"), tr = $("trail"); if (!mk || !F.length) return;
+  while (A.i < F.length - 1 && C[A.i + 1] <= A.d) { A.i++; if (F[A.i].k !== "rapid") A.trail.push(r2(X(F[A.i].x)) + "," + r2(Y(F[A.i].y))); else A.trail.push("M"); }
+  var p = F[A.i], q = F[Math.min(A.i + 1, F.length - 1)], span = (C[A.i + 1] - C[A.i]) || 1, t = clamp((A.d - C[A.i]) / span, 0, 1);
+  var x = p.x + (q.x - p.x) * t, y = p.y + (q.y - p.y) * t;
+  mk.setAttribute("cx", r2(X(x))); mk.setAttribute("cy", r2(Y(y)));
+  // trail: only feed moves (break at rapids by using the last continuous run)
+  var lastM = A.trail.lastIndexOf("M"); tr.setAttribute("points", A.trail.slice(lastM + 1).join(" "));
+  if (A.i >= F.length - 1) { A.on = false; $("playBtn").textContent = "↺ Replay"; return; }
+  A.raf = requestAnimationFrame(animStep);
+}
+function play() {
+  var b = $("playBtn");
+  if (A.on) { A.on = false; b.textContent = "▶ Play"; return; }
+  if (A.i >= CUR.flat.length - 1) { A.d = 0; A.i = 0; A.trail = []; }
+  A.on = true; A.t0 = 0; b.textContent = "❚❚ Pause"; A.raf = requestAnimationFrame(animStep);
+}
+var paths = {
+  stage: function () { animReset(); return "<h3>Top view · " + (S.sw === "cc" ? "Carbide Create" : "Fusion 360") + " · " + OPS[S.op].n + "</h3>" + topSVG() + "<h3>Side section (schematic)</h3>" + secSVG(); },
+  legend: function () {
+    return '<span data-info="tp_cut"><i class="sw" style="border-color:#B71F34"></i>Cut</span><span data-info="tp_rapid"><i class="sw dash" style="border-color:#05A7E0"></i>Rapid</span>' +
+      '<span data-info="tp_ramp"><i class="sw dash" style="border-color:#F15B29"></i>Ramp / plunge</span><span data-info="tp_lead" data-min="2"><i class="sw" style="border-color:#7A7F84"></i>Lead in/out</span>' +
+      '<span data-info="tp_tab"><i class="sw fill" style="background:#010101;height:5px"></i>Tab</span><span data-info="tp_zero"><i class="sw fill" style="background:#FCC424;border-radius:50%;width:10px"></i>Work zero</span>';
+  },
+  rail: function () {
+    var op = OPS[S.op], ops = Object.keys(OPS).filter(function (k) { return OPS[k].sw === S.sw; });
+    var tl = op.tool.t === "v" ? op.tool.incl + "° V-bit (1/4″ shank)" : frac(op.tool.D) + " " + (op.tool.t === "ball" ? "ball" : "flat") + " endmill";
+    return '<section class="grp"><h2 class="lbl">CAM software</h2>' + seg("sw", [["cc", "Carbide Create"], ["f", "Fusion 360"]]) +
+      '<p class="note">' + (S.sw === "cc" ? `2D toolpaths for the <b>Shapeoko</b>. The sample part has a pocket, a V-carved star, two holes and an outline.` : `Used for the <b>Carvera Air</b> and anything 3D on the Shapeoko. The sample part has a pocket, a 3D dome, two holes and an outline.`) + "</p></section>" +
+      '<section class="grp" style="--c:var(--yellow)"><h2 class="lbl">Toolpath</h2><div class="ops" role="group">' +
+      ops.map(function (k) { var o = OPS[k]; return '<button type="button" data-set="op" data-v="' + k + '" aria-pressed="' + (k === S.op) + '"' + (o.lv > 1 ? ' data-min="' + o.lv + '"' : "") + ' data-info="op_' + k + '">' + hex(MODES[o.lv].c, 13) + "<b>" + o.n + "</b></button>"; }).join("") + "</div>" +
+      '<div id="opInfo" style="font-size:14px">' + infoHTML("op_" + S.op) + "</div>" +
+      '<p class="note">Tool: <b>' + tl + "</b></p></section>" +
+      '<section class="grp" style="--c:var(--blue)" data-min="2"><h2 class="lbl">Settings</h2>' +
+      (op.use.indexOf("so") >= 0 ? '<div class="slide"><span class="term" data-info="tp_step">Stepover</span><input type="range" data-set="stepover" data-u="%" min="10" max="80" step="5" value="' + S.stepover + '"><output>' + S.stepover + "%</output></div>" : "") +
+      (op.use.indexOf("sd") >= 0 ? '<div class="slide"><span class="term" data-info="sec_pass">Depth / pass</span><input type="range" data-set="stepdown" data-u=" mm" min="0.5" max="6" step="0.5" value="' + S.stepdown + '"><output>' + S.stepdown + " mm</output></div>" : "") +
+      (op.use.indexOf("tabs") >= 0 ? '<label class="chk"><input type="checkbox" data-set="tabs"' + (S.tabs ? " checked" : "") + '> <span class="term" data-info="tp_tab">Tabs</span> (hold the part on through-cuts)</label>' : "") +
+      (!op.use.length ? '<p class="note">' + (S.op === "adaptive" ? "Adaptive uses optimal load instead of stepover, and one deep stepdown." : "No adjustable settings for this demo.") + "</p>" : "") +
+      '<div data-min="3"><div class="sub" style="margin-bottom:6px">Direction</div>' + seg("climb", [[true, "Climb"], [false, "Conventional"]]) + "</div></section>" +
+      '<section class="grp" style="--c:var(--aqua)"><h2 class="lbl">Watch it run</h2><div class="row"><button type="button" class="btn pri" id="playBtn">▶ Play</button>' +
+      '<button type="button" class="btn sec" id="rstBtn">Restart</button></div><div class="row"><span class="sub">Speed</span>' + seg("speed", [[1, "1×"], [3, "3×"], [10, "10×"]]) + "</div></section>";
+  },
+  after: function () {
+    $("playBtn").onclick = play;
+    $("rstBtn").onclick = function () { animReset(); var mk = $("toolMk"); mk.setAttribute("cx", X(HOME[0])); mk.setAttribute("cy", Y(HOME[1])); $("trail").setAttribute("points", ""); play(); };
+  }
+};
+
+/* ================= FEEDS & SPEEDS ================= */
+function calc() {
+  var f = S.f, m = MACH[f.m], mat = MATS[f.mat], D = f.dia, w = [], notes = [];
+  var strat = f.tool === "taper" ? "slot" : f.strat;
+  var cl = D < 3.175 ? mat.cl[0] * D / 3.175 : mat.cl[0] + (mat.cl[1] - mat.cl[0]) * Math.min((D - 3.175) / 3.175, 1.5);
+  if (f.tool === "taper") cl *= 0.6; if (f.tool === "ball") cl *= 0.9;
+  var rpm = mat.rpm[f.m] * (D <= 1.6 ? 1.2 : 1), dial = null;
+  rpm = clamp(rpm, m.rpmMin, m.rpmMax);
+  if (m.dial) { var best = m.dial[0]; m.dial.forEach(function (d) { if (Math.abs(d[1] - rpm) < Math.abs(best[1] - rpm)) best = d; }); rpm = best[1]; dial = best[0]; }
+  else rpm = Math.round(rpm / 500) * 500;
+  var docK = f.mat === "al" ? 1 : m.docK, doc, woc, ctf = 1;
+  if (f.tool === "taper") { doc = Math.max(0.2, mat.doc * 1.6 * docK); woc = null; }
+  else if (strat === "slot") { doc = mat.doc * D * docK; woc = 0.4 * D; }
+  else if (strat === "adapt") { doc = (f.mat === "al" ? 1 : 2) * D * (f.m === "ca" && f.mat !== "al" ? 0.75 : 1); woc = mat.ad * D; }
+  else { doc = f.tool === "ball" ? null : Math.min(3 * D, mat.doc * D * 4 * docK); woc = (f.tool === "ball" ? 0.1 : 0.05) * D; }
+  if (woc && strat !== "slot" && woc < D / 2) ctf = Math.min(2, 1 / Math.sqrt(1 - Math.pow(1 - 2 * woc / D, 2)));
+  var over = parseFloat(f.cl); var clUse = over > 0 ? (f.units === "in" ? over * 25.4 : over) : cl;
+  var feed = rpm * f.fl * clUse * ctf;
+  if (feed > m.feedMax) { w.push(`Feed capped at ${f.units === "in" ? Math.round(m.feedMax / 25.4) + " in/min" : m.feedMax + " mm/min"}, a practical limit for the ${m.short}. Reduce flutes or DOC rather than pushing faster.`); feed = m.feedMax; }
+  var plunge = feed * (f.mat === "al" ? 0.25 : 0.33);
+  var deff = null, scallop = null;
+  if (f.tool === "ball") { if (doc && doc < D / 2) deff = 2 * Math.sqrt(doc * (D - doc)); if (strat === "finish") { var R = D / 2; scallop = R - Math.sqrt(R * R - Math.pow(woc / 2, 2)); } }
+  var mrr = doc && (woc || strat === "slot") ? doc * (strat === "slot" ? D : woc) * feed / 1000 : null;
+  if (f.m === "ca" && D > 3.175) w.push(`Carvera Air: 1/4″ tools need the 1/4″ collet and a 1/4″ bit collar.`);
+  if (f.m === "so" && f.mat === "al") w.push(`Aluminum is cut on the Carvera Air at REEF.`);
+  if (f.fl >= 3 && f.mat !== "al") w.push(`3 flutes in wood or plastic can pack chips — 1–2 flutes is usually better.`);
+  if (f.mat === "al" && f.fl >= 3) w.push(`On the Carvera Air, 1–2 flutes clear aluminum chips better than 3.`);
+  if (f.mat === "acr" || f.mat === "hdpe") notes.push(`Plastics: single-flute O-flute tools work best. Melting or gummy chips → raise feed or lower RPM.`);
+  if (f.tool === "taper") notes.push(`V-bits and tapered tools: V-Carve and Chamfer calculate depth from the design; these numbers are per pass.`);
+  if (f.mat === "al") notes.push(`Aluminum: ramp at 1–2°, use adaptive clearing, clear chips (air or brush between passes), and never let chips re-cut.`);
+  if (f.m === "so" && f.mat === "ply") notes.push(`REEF shop baseline for plywood on the Shapeoko: 18,000 RPM at 100 in/min with a 1/4″ 2-flute flat endmill.`);
+  if (dial) notes.push(`Set the Compact Router dial to <b>${dial}</b> before starting, and enter ${rpm.toLocaleString()} RPM in your CAM.`);
+  return { rpm: rpm, dial: dial, feed: feed, plunge: plunge, doc: doc, woc: woc, cl: clUse, ctf: ctf, mrr: mrr, deff: deff, scallop: scallop, warn: w, notes: notes, strat: strat };
+}
+function uL(mm, d) { if (mm == null) return "—"; return S.f.units === "in" ? (mm / 25.4).toFixed(d == null ? 3 : d) + " in" : mm.toFixed(2) + " mm"; }
+function uF(v) { return S.f.units === "in" ? (v / 25.4).toFixed(1) + " in/min" : Math.round(v) + " mm/min"; }
+function feedsSVG(c) {
+  var f = S.f, mat = MATS[f.mat], D = f.dia, cx = 210, top = 150, dp = c.doc ? clamp(c.doc / D * 56, 6, 140) : 18, s = "";
+  s += '<g data-info="fs_mat"><polygon points="30,' + (top + dp) + " " + cx + "," + (top + dp) + " " + cx + "," + top + " 360," + top + " 360,300 30,300" + '" fill="' + mat.col + '" stroke="#5A5F63"/><text x="300" y="290" text-anchor="middle" style="font-size:12px;fill:#424143;font-weight:700">' + mat.n.split(" (")[0] + "</text></g>";
+  var fb = top + dp, ft = fb - 70, fl;
+  if (f.tool === "ball") fl = "M" + (cx - 28) + " " + ft + " V" + (fb - 28) + " A28 28 0 0 0 " + (cx + 28) + " " + (fb - 28) + " V" + ft + " Z";
+  else if (f.tool === "taper") fl = "M" + (cx - 28) + " " + ft + " L" + cx + " " + fb + " L" + (cx + 28) + " " + ft + " Z";
+  else fl = "M" + (cx - 28) + " " + ft + " V" + fb + " H" + (cx + 28) + " V" + ft + " Z";
+  s += '<g data-info="fs_tool"><rect x="' + (cx - 20) + '" y="30" width="40" height="' + (ft - 30) + '" fill="#C9CDD1" stroke="#424143"/><path d="' + fl + '" fill="#B5BBC0" stroke="#424143"/>';
+  for (var k = 0; k < 4; k++) s += '<path d="M' + (cx - 26) + " " + (ft + 10 + k * 16) + " l52 -14" + '" stroke="#424143" stroke-opacity=".5" stroke-width="5" clip-path="none"/>';
+  s += "</g>";
+  s += '<g data-info="fs_rot" data-extra="' + c.rpm.toLocaleString() + ' RPM"><ellipse cx="' + cx + '" cy="66" rx="36" ry="9" fill="none" stroke="#05A7E0" stroke-width="2.5"/><path d="M' + (cx + 30) + ' 72 l10 -2 -5 9z" fill="#05A7E0"/></g>';
+  s += '<g data-info="fs_rpm"><text x="' + (cx + 46) + '" y="60" text-anchor="start" ' + TXT + ">" + c.rpm.toLocaleString() + " RPM" + (c.dial ? " · dial " + c.dial : "") + "</text></g>";
+  s += '<g data-info="fs_feed"><path d="M' + (cx + 40) + " 128 h90" + '" stroke="#B71F34" stroke-width="3"/><path d="M' + (cx + 134) + ' 128 l-12 -7 v14z" fill="#B71F34"/><text x="' + (cx + 40) + '" y="116" text-anchor="start" ' + TXT + ">Feed " + uF(c.feed) + "</text></g>";
+  s += '<g data-info="fs_plunge"><path d="M' + (cx - 60) + " 70 v40" + '" stroke="#F15B29" stroke-width="3"/><path d="M' + (cx - 60) + ' 116 l-6 -11 h12z" fill="#F15B29"/><text x="' + (cx - 70) + '" y="96" text-anchor="end" ' + TXT + ">Plunge " + uF(c.plunge) + "</text></g>";
+  s += '<g data-info="fs_doc"><path d="M' + (cx + 40) + " " + top + " v" + dp + " M" + (cx + 34) + " " + top + " h12 M" + (cx + 34) + " " + (top + dp) + ' h12" style="stroke:var(--fg)" stroke-width="1.5"/><text x="' + (cx + 52) + '" y="' + (top + dp / 2 + 5) + '" text-anchor="start" ' + TXT + ">DOC " + (c.doc ? uL(c.doc) : "follows surface") + "</text></g>";
+  // top view
+  var tx = 490, ty = 190, R = 50, ae = c.woc && c.strat !== "slot" ? clamp(c.woc / D * 100, 4, 100) : 100, xl = tx + R - ae;
+  var mp = xl + ",70 590,70 590,300 " + (tx + R) + ",300 " + (tx + R) + "," + ty + " " + xl + "," + ty;
+  s += '<text x="490" y="56" text-anchor="middle" ' + TXT + ">Top view</text>";
+  s += '<defs><clipPath id="mclip"><polygon points="' + mp + '"/>' + (ae >= 100 ? '<rect x="390" y="70" width="' + (tx - R - 390) + '" height="230"/>' : "") + "</clipPath></defs>";
+  s += '<g data-info="fs_top"><polygon points="' + mp + '" fill="' + mat.col + '" stroke="#5A5F63"/>' + (ae >= 100 ? '<rect x="390" y="70" width="' + (tx - R - 390) + '" height="230" fill="' + mat.col + '" stroke="#5A5F63"/>' : "") +
+    '<circle cx="' + tx + '" cy="' + ty + '" r="' + R + '" fill="rgba(181,187,192,.5)" stroke="#424143" stroke-width="1.5"/>' +
+    '<path d="M' + (tx - 22) + " " + (ty - 14) + " A26 26 0 1 1 " + (tx - 22) + " " + (ty + 14) + '" fill="none" stroke="#05A7E0" stroke-width="2"/><path d="M' + (tx - 26) + " " + (ty + 6) + ' l4 12 7 -10z" fill="#05A7E0"/>' +
+    '<path d="M' + tx + " " + (ty - R - 8) + " v-40" + '" stroke="#B71F34" stroke-width="3"/><path d="M' + tx + " " + (ty - R - 52) + ' l-7 12 h14z" fill="#B71F34"/></g>';
+  s += '<g data-info="fs_woc"><circle cx="' + tx + '" cy="' + ty + '" r="' + R + '" fill="rgba(183,31,52,.55)" clip-path="url(#mclip)"/><path d="M' + xl + " 316 H" + (tx + R) + " M" + xl + " 310 v12 M" + (tx + R) + ' 310 v12" style="stroke:var(--fg)" stroke-width="1.5"/><text x="' + ((xl + tx + R) / 2) + '" y="336" text-anchor="middle" ' + TXT + ">WOC " + (c.strat === "slot" && f.tool !== "taper" ? "100% (slot)" : c.woc ? Math.round(c.woc / D * 100) + "%" : "—") + "</text></g>";
+  return '<svg viewBox="0 0 600 345" role="img" aria-label="Feeds and speeds diagram">' + s + "</svg>";
+}
+var LAST = null;
+var feeds = {
+  stage: function () { LAST = calc(); return "<h3>" + MACH[S.f.m].name + " · " + MATS[S.f.mat].n + "</h3>" + feedsSVG(LAST); },
+  legend: function () { return '<span><i class="sw" style="border-color:#05A7E0"></i>Rotation</span><span><i class="sw" style="border-color:#B71F34"></i>Feed direction</span><span><i class="sw fill" style="background:rgba(183,31,52,.55)"></i>Engaged edge</span>'; },
+  rail: function () {
+    var c = LAST || calc(), f = S.f, u = f.units === "in";
+    var mats = Object.keys(MATS).map(function (k) { return [k, MATS[k].n.split(" (")[0], 0, MATS[k].on.indexOf(f.m) < 0, "fs_mat"]; });
+    var cardH = function (key, lab, val, sub, min) { return '<div class="card" data-info="' + key + '"' + (min ? ' data-min="' + min + '"' : "") + "><span>" + lab + "</span><b>" + val + "</b>" + (sub ? "<small>" + sub + "</small>" : "") + "</div>"; };
+    return '<section class="grp"><h2 class="lbl">Setup</h2>' +
+      '<div class="sub">Machine</div>' + seg("f.m", [["so", "Shapeoko 5 Pro"], ["ca", "Carvera Air"]]) +
+      '<div class="sub">Material</div>' + seg("f.mat", mats) +
+      '<div class="sub">Endmill</div>' + seg("f.tool", [["flat", "Flat"], ["ball", "Ball"], ["taper", "Tapered / V"]]) +
+      '<div class="sub">' + (f.tool === "taper" ? "Shank" : "Diameter") + "</div>" + seg("f.dia", [[3.175, "1/8″"], [6.35, "1/4″"]]) +
+      '<div class="sub">Flutes</div>' + seg("f.fl", [[1, "1"], [2, "2"], [3, "3", 2]]) +
+      (f.tool !== "taper" ? '<div data-min="2"><div class="sub" style="margin-bottom:6px">Cut type</div>' + seg("f.strat", [["slot", "Slot / pocket"], ["adapt", "Adaptive (Fusion)"], ["finish", "Finishing pass"]]) + "</div>" : "") +
+      '<div class="sub">Units</div>' + seg("f.units", [["in", "inch"], ["mm", "mm"]]) +
+      '<div data-min="3" class="row"><label class="sub" for="clOver">Chipload override (' + (u ? "in" : "mm") + '/tooth)</label><input type="number" id="clOver" data-set="f.cl" step="0.0005" min="0" placeholder="auto" value="' + f.cl + '"></div></section>' +
+      '<section class="grp" style="--c:var(--yellow)"><h2 class="lbl">Starting point</h2><div class="cards">' +
+      cardH("fs_rpm", "Spindle speed", c.rpm.toLocaleString() + " RPM", c.dial ? "Router dial " + c.dial : "set in CAM") +
+      cardH("fs_feed", "Feed rate", uF(c.feed), "") +
+      cardH("fs_plunge", "Plunge rate", uF(c.plunge), "or ramp " + (f.mat === "al" ? "1–2°" : "2–5°")) +
+      cardH("fs_doc", "Depth per pass", c.doc ? uL(c.doc) : "—", c.doc ? Math.round(c.doc / f.dia * 100) + "% of D" : "follows 3D surface") +
+      cardH("fs_woc", "Stepover / width", c.woc ? uL(c.woc) : "—", c.woc ? Math.round(c.woc / f.dia * 100) + "% of D" : "", 1) +
+      cardH("fs_chip", "Chipload", u ? (c.cl / 25.4).toFixed(4) + " in" : c.cl.toFixed(3) + " mm", "per tooth", 2) +
+      cardH("fs_ctf", "Chip thinning", "×" + c.ctf.toFixed(2), "applied to feed", 3) +
+      cardH("fs_mrr", "Removal rate", c.mrr ? (u ? (c.mrr / 16.387).toFixed(2) + " in³/min" : c.mrr.toFixed(1) + " cm³/min") : "—", "", 3) +
+      (c.deff ? cardH("fs_deff", "Effective dia.", uL(c.deff), "ball at this DOC", 3) : "") +
+      (c.scallop != null ? cardH("fs_scallop", "Scallop height", uL(c.scallop, 4), "at this stepover", 3) : "") + "</div>" +
+      c.warn.map(function (x) { return '<p class="warn" style="margin:0">' + x + "</p>"; }).join("") +
+      c.notes.map(function (x) { return '<p class="note">' + x + "</p>"; }).join("") +
+      '<p class="note">These are conservative starting points. Run a test cut, then adjust by sound and chips.</p></section>' +
+      '<section class="grp" style="--c:var(--blue)"><h2 class="lbl">Listen &amp; look</h2><ul class="plain">' +
+      "<li><b>Steady hum, clean chips</b> → good.</li><li><b>Fine dust or burning smell</b> → rubbing: raise feed or lower RPM.</li>" +
+      "<li><b>Squeal / chatter</b> → lower DOC or stick-out; try a slightly different RPM.</li><li><b>Bogging / deflection</b> → too heavy: lower DOC or feed.</li>" +
+      '<li data-min="2"><b>Melting plastic</b> → more feed, fewer flutes, clear chips.</li><li data-min="3"><b>Aluminum built-up edge</b> → chips welding to the tool; clear chips, slightly lower RPM, keep chipload up.</li></ul></section>';
+  }
+};
+
+/* ================= WORKFLOW & SAFETY ================= */
+var FLOWS = { so_cc: { n: "Shapeoko · Carbide Create", m: "so", cam: "cc" }, so_f: { n: "Shapeoko · Fusion 360", m: "so", cam: "f" }, ca_f: { n: "Carvera Air · Fusion 360", m: "ca", cam: "f" } };
+function steps() {
+  var p = FLOWS[S.flow], cc = p.cam === "cc", so = p.m === "so";
+  return [
+    { t: "Design", s: cc ? "Draw in Carbide Create or import SVG/DXF" : "Model in Fusion 360 (Design)", b: cc ? `Draw shapes and text right in Carbide Create, or import an SVG/DXF from Illustrator or Inkscape.` : `Create a 3D model or sketch in Fusion 360’s Design workspace.`,
+      i: `Design around the tool: inside corners get a radius equal to the tool radius.`, e: cc ? `Close all vectors — open paths can only be cut “on the line.”` : `Model the stock and any fixtures/clamps as bodies so Fusion can check collisions.` },
+    { t: "Set up CAM", s: cc ? "Job setup: size, thickness, zero" : "Manufacture → Setup: WCS + stock", b: `Tell the software how big your material is and where zero is.`,
+      i: cc ? `Carbide Create Job Setup: width, height, thickness, Zero position (lower-left, top) and material.` : `Fusion Setup: pick the machine, set WCS orientation, origin (stock box point — top, front-left) and stock size.`,
+      e: cc ? `Set the retract height above your clamps.` : `Use the ${so ? "Carbide 3D" : "Makera Carvera"} machine definition so limits and post match.` },
+    { t: "Toolpaths", s: cc ? "Contour, Pocket, V-Carve, Drill" : "Face, Adaptive, Contour, 3D…", b: `Choose operations and tools. The Toolpaths tab shows what each one does.`,
+      i: `Pick the tool from the library and check feeds &amp; speeds for your material.`, e: `Order matters: face → rough → finish → chamfer → cut out last (with tabs).` },
+    { t: "Simulate", s: "Preview the cut — look for problems", b: `Watch the simulation before you ever touch the machine.`,
+      i: cc ? `Carbide Create: Simulate toolpaths in 3D view. Check depth and that nothing cuts where it shouldn’t.` : `Fusion: Simulate with stock, turn on collisions. Red = trouble.`, e: `Check the machining time — a 4-hour estimate on a beginner job usually means a settings mistake.` },
+    { t: "Export", s: cc ? "Save G-code (.nc)" : (so ? "Post: Carbide 3D (Grbl)" : "Post: Makera Carvera"), b: `Save the toolpaths as a G-code file the machine can read.`,
+      i: cc ? `Carbide Create: Save G-code. One file can hold all toolpaths and tool changes.` : `Fusion: Post Process with the ${so ? "Carbide 3D (Grbl)" : "Makera Carvera"} post.`, e: `Open the .nc in a text editor once — you’ll see the RPM (S), feeds (F) and tool changes (M6/T).` },
+    { t: "Hold & tool", s: so ? "Screw stock to spoilboard · install bit" : "Clamp stock · load tool + collar", b: `Clamp your material firmly and install the first tool.`,
+      i: so ? `Screw or clamp the stock to the spoilboard in waste areas (not into the aluminum frame). Tighten the ER-16 collet nut with the wrenches.` : `Insert the tool with its bit collar using the quick-change lever.`, e: `Keep clamps clear of every toolpath and below the retract height.` },
+    { t: "Zero", s: so ? "Carbide Motion: BitZero / jog" : "Makera Controller: probe origin", b: `Show the machine where X0 Y0 Z0 is on your stock — same spot you chose in CAM.`,
+      i: so ? `Use BitZero on the front-left corner, or jog and Zero All. BitSetter handles tool lengths.` : `Probe the corner and top, or set origin by jogging. Tool length is measured automatically.`, e: `Double-check Z0: stock top vs. spoilboard is the most common crash.` },
+    { t: "Run & watch", s: so ? "Vacuum on · ear + eye protection" : "Door closed · stay nearby", b: `Start the job and stay with the machine the whole time. Know where Pause / Stop is.`,
+      i: so ? `Turn on the vacuum; Carbide Motion starts the spindle at the programmed RPM. Watch the first pass closely and listen.` : `Keep the door closed. Watch chips and sound during the first pass.`, e: `Use feed override to tune live. Stop if you smell burning, hear chatter, or see the part move.` }
+  ];
+}
+var CHECKS = [
+  ["Safety glasses on" + "", 1, "*"], ["Hearing protection (cutting is loud)", 1, "so"], ["Hair tied back; no loose sleeves, jewelry or gloves near the spindle", 1, "*"],
+  ["Stock screwed or clamped down; screws and clamps outside every toolpath", 1, "*"], ["Right tool installed; collet tight", 1, "*"],
+  ["X/Y/Z zero set at the same spot as in CAM", 1, "*"], ["Vacuum / dust boot on", 1, "so"], ["Door closed", 1, "ca"],
+  ["I will stay with the machine the whole time", 1, "*"],
+  ["Simulated in CAM; no collisions", 2, "*"], ["Retract / safe height clears clamps", 2, "*"], ["Tool numbers in the file match the tools I’ll load", 2, "*"], ["Feeds checked for this tool and material", 2, "*"],
+  ["Stock thickness measured; through-cuts ≤ 0.5 mm into the spoilboard", 3, "*"], ["Tool stick-out as short as the depth allows", 3, "*"], ["Probe/sensor clean (no chips)", 3, "*"]
+];
+function flowSVG() {
+  var st = steps(), cols = ["#B71F34", "#FCC424", "#05A7E0", "#7DCFD8"], s = "";
+  st.forEach(function (x, i) {
+    I["wf_" + i] = { t: (i + 1) + ". " + x.t, tag: FLOWS[S.flow].n, b: x.b, i: x.i, e: x.e };
+    var row = i < 4 ? 0 : 1, col = i % 4, X0 = 14 + col * 152, Y0 = 30 + row * 150;
+    var words = x.s.split(" "), lines = [""], k;
+    words.forEach(function (w) { if ((lines[lines.length - 1] + " " + w).trim().length > 19) lines.push(w); else lines[lines.length - 1] = (lines[lines.length - 1] + " " + w).trim(); });
+    s += '<g data-info="wf_' + i + '" tabindex="0"><rect x="' + X0 + '" y="' + Y0 + '" width="134" height="104" rx="6" style="fill:var(--surface);stroke:var(--line)" stroke-width="1.5"/>' +
+      '<circle cx="' + (X0 + 20) + '" cy="' + (Y0 + 20) + '" r="12" fill="' + cols[i % 4] + '"/><text x="' + (X0 + 20) + '" y="' + (Y0 + 25) + '" text-anchor="middle" style="font-size:13px;font-weight:700;fill:' + (i % 4 ? "#010101" : "#fff") + '">' + (i + 1) + "</text>" +
+      '<text x="' + (X0 + 38) + '" y="' + (Y0 + 25) + '" style="font-size:14px;font-weight:700;fill:var(--fg)">' + x.t + "</text>" +
+      lines.slice(0, 3).map(function (l, j) { return '<text x="' + (X0 + 12) + '" y="' + (Y0 + 54 + j * 16) + '" style="font-size:12px;fill:var(--muted)">' + l + "</text>"; }).join("") + "</g>";
+    if (col < 3) s += '<path d="M' + (X0 + 136) + " " + (Y0 + 52) + " h12" + '" style="stroke:var(--fg)" stroke-width="2"/><path d="M' + (X0 + 150) + " " + (Y0 + 52) + ' l-7 -5 v10z" style="fill:var(--fg)"/>';
+  });
+  s += '<path d="M' + (14 + 3 * 152 + 67) + " 136 v14 H81 v14" + '" style="stroke:var(--fg)" stroke-width="2" fill="none"/><path d="M81 172 l-5 -8 h10z" style="fill:var(--fg)"/>';
+  return '<svg viewBox="0 0 620 290" role="img" aria-label="CNC workflow">' + s + "</svg>";
+}
+function updateProg() {
+  var boxes = rail.querySelectorAll("[data-chk]"), n = 0, t = 0;
+  boxes.forEach(function (b) { if (b.closest("[data-min]") && getComputedStyle(b.closest("[data-min]")).display === "none") return; t++; if (b.checked) n++; });
+  var p = $("progBar"), l = $("progLbl"); if (p) p.style.width = (t ? n / t * 100 : 0) + "%"; if (l) l.textContent = n + " / " + t + (n === t && t ? " — ready to run" : "");
+}
+var flow = {
+  stage: function () { return "<h3>" + FLOWS[S.flow].n + " · design to finished part</h3>" + flowSVG(); },
+  legend: function () { return "<span>Hover a step for details. The checklist on the right is your pre-run check.</span>"; },
+  rail: function () {
+    var m = FLOWS[S.flow].m;
+    return '<section class="grp"><h2 class="lbl">Workflow</h2>' + seg("flow", Object.keys(FLOWS).map(function (k) { return [k, FLOWS[k].n]; })) + "</section>" +
+      '<section class="grp" style="--c:var(--yellow)"><h2 class="lbl">Pre-run checklist</h2><div class="prog"><i id="progBar"></i></div><p class="note" id="progLbl"></p><div class="checks">' +
+      CHECKS.filter(function (c) { return c[2] === "*" || c[2] === m; }).map(function (c, i) {
+        var id = "c" + CHECKS.indexOf(c);
+        return '<label class="chk" data-min="' + c[1] + '"><input type="checkbox" data-chk="' + id + '"' + (S.checks[S.flow + id] ? " checked" : "") + "> " + c[0] + "</label>";
+      }).join("") + "</div></section>" +
+      '<section class="grp" style="--c:var(--red)"><h2 class="lbl">Never</h2><ul class="plain"><li>Reach toward a spinning tool or clear chips while it’s running.</li><li>Leave a running machine unattended.</li><li>Wear gloves near the spindle.</li>' +
+      (m === "so" ? "<li>Cut aluminum on the Shapeoko at REEF.</li>" : "<li>Open the door mid-cut to grab chips.</li>") + '<li data-min="2">Run a file you haven’t simulated.</li></ul><p class="note">When in doubt, pause and ask REEF staff.</p></section>';
+  },
+  after: updateProg
+};
+
+/* ---------------- render ---------------- */
+var VIEWS = { machines: machines, tools: tools, paths: paths, feeds: feeds, flow: flow };
+function renderStage() {
+  var v = VIEWS[S.tab];
+  if (S.tab === "paths") { animReset(); stage.innerHTML = paths.stage(); }
+  else stage.innerHTML = v.stage();
+}
+function render() {
+  fixState();
+  document.querySelectorAll("#tabSeg button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-v") === S.tab); });
+  var v = VIEWS[S.tab];
+  stage.innerHTML = v.stage(); legend.innerHTML = v.legend(); rail.innerHTML = v.rail();
+  if (v.after) v.after();
+  card.innerHTML = '<p class="empty">Hover over a part of the ' + { machines: "machine", tools: "endmill", paths: "toolpath or section", feeds: "diagram or a result card", flow: "workflow" }[S.tab] + " to see what it is and why it matters.</p>";
+  tip.hidden = true; curEl = null;
+}
+drawMode(); render();
+})();
+</script>
+</body></html>
