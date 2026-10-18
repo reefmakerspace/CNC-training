@@ -302,11 +302,11 @@ var I = {
     i: `Make sure the tool you install matches the tool number and size in your CAM file.`,
     e: `Deflection scales with stick-out³: doubling stick-out makes the tool about 8× more flexible.` },
   so_waste: { t: `Spoilboard`, tag: `4 × 4 ft bed`, b: `The sacrificial board under your material. It’s okay to cut slightly into it on through-cuts.`,
-    i: `At REEF, material is held by screwing or clamping into the spoilboard — not by locking into the aluminum frame. The spoilboard is surfaced (faced) now and then so it stays flat to the gantry.`,
+    i: `At REEF, material is held down with composite brad nails shot into the spoilboard (or clamps) — not by locking into the aluminum frame. The spoilboard is surfaced (faced) now and then so it stays flat to the gantry.`,
     e: `For through-cuts go 0.2–0.5 mm below the stock bottom. Measure stock with calipers — “3/4 in” plywood is often 0.70–0.72 in.` },
-  so_clamps: { t: `Workholding screws & clamps`, b: `Screws or clamps fastened into the spoilboard hold your material so it can’t move or fly loose. Loose stock is dangerous.`,
-    i: `Put screws in waste areas, well outside every toolpath — an endmill that hits a steel screw breaks. Keep clamps below the safe (retract) height, and mark screw spots in CAM if they’re close.`,
-    e: `Screw near the middle of large sheets too, so they stay flat. For thin sheets, painter’s tape + CA glue also works; use tabs or onion-skin passes so parts can’t break free.` },
+  so_clamps: { t: `Brad nails & clamps`, tag: `composite nails`, b: `A brad nailer shoots plastic (composite) nails through your material into the spoilboard so it can’t move or fly loose. Loose stock is dangerous.`,
+    i: `Composite nails are plastic, so if the endmill clips one it cuts through instead of breaking the bit — but still put them in <b>waste areas</b>, outside every toolpath, so they don’t pull a part loose or leave plastic in your cut. Never use steel brads or staples. Keep any clamps below the safe (retract) height.`,
+    e: `Nail near the middle of large sheets too, so they stay flat. After the job, pry the sheet up — the nails shear off; leftover stubs in the spoilboard get removed when it’s surfaced. Pair nails with tabs or onion-skin passes so small parts can’t break free.` },
   so_stock: { t: `Stock (your material)`, b: `The raw material you’re cutting.`,
     i: `On the Shapeoko at REEF: wood, plywood, MDF, plastics (HDPE, acetal, acrylic) and foam. Aluminum goes on the Carvera Air.`,
     e: `Model true thickness in CAM and make the stock box slightly bigger than the real piece — all depths are computed from it.` },
@@ -493,8 +493,8 @@ var I = {
    then "Save HTML with photos" downloads a new self-contained file. */
 var PHOTO_KEYS = {
   so_spindle: `VFD spindle on the Z carriage`, so_collet: `ER-16 collet, nut and the two wrenches`,
-  so_bitsetter: `BitSetter at the front-left of the bed`, so_bitzero: `BitZero on a stock corner, clip on the collet`,
-  so_waste: `Spoilboard with stock screwed down in waste areas`, so_dust: `Dust boot with brush skirt and hose`,
+  so_bitsetter: `BitSetter at the front-left of the bed`, so_bitzero: `BitZero on a stock corner, clip on the collet`, so_clamps: `Brad nailer with composite nails, and nails in a waste area`,
+  so_waste: `Spoilboard with stock brad-nailed down in waste areas`, so_dust: `Dust boot with brush skirt and hose`,
   ca_qtc: `Quick-change lever open, tool going in`, ca_collet: `Endmill with a bit collar installed`,
   ca_tls: `Tool length sensor on the bed`, ca_probe: `Probe touching a stock edge`, ca_bed: `Stock clamped on the worktable`,
   em_flat: `Flat endmill close-up`, em_ball: `Ball endmill close-up`, em_taper: `V-bit / tapered endmill close-up`,
@@ -685,7 +685,7 @@ function shapeokoSVG() {
     '<g data-info="so_sw" tabindex="0"><rect x="528" y="382" width="60" height="34" rx="3" fill="#231F20"/><rect x="533" y="386" width="50" height="25" fill="#05A7E0"/><polygon points="520,416 596,416 604,426 512,426" fill="#424143"/></g>' +
     labels([["so_gantry", "Gantry (X)", 150, 172, 150, 128], ["so_spindle", "VFD spindle", 300, 140, 230, 84, 0, "end"], ["so_z", "Z axis", 366, 124, 420, 84, 0, "start"],
       ["so_collet", "Collet", 310, 262, 270, 244, 0, "end"], ["so_bit", "Endmill", 321, 290, 270, 276, 0, "end"], ["so_dust", "Dust boot", 486, 92, 500, 64, 0, "start"],
-      ["so_stock", "Stock", 300, 320, 300, 404], ["so_clamps", "Screws", 212, 317, 170, 404], ["so_bitsetter", "BitSetter", 100, 322, 96, 250, 0, "start"],
+      ["so_stock", "Stock", 300, 320, 300, 404], ["so_clamps", "Brad nails", 212, 317, 170, 404], ["so_bitsetter", "BitSetter", 100, 322, 96, 250, 0, "start"],
       ["so_bitzero", "BitZero", 415, 318, 470, 346, 0, "start"], ["so_waste", "Spoilboard", 130, 350, 60, 404], ["so_sw", "Carbide Motion", 528, 400, 506, 404, 0, "end"]]) + "</svg>";
 }
 function carveraSVG() {
@@ -713,7 +713,7 @@ var CMP = [
   ["Best for", "Bigger parts in wood, plastic and foam: signs, furniture parts, panels", "Small, precise parts; aluminum; PCBs; engraving", 1],
   ["Materials", "Wood, plywood, MDF, plastics, foam", "All of those plus aluminum, brass, copper", 1],
   ["Work area", "4 × 4 ft bed", "300 × 200 × 130 mm", 1],
-  ["Workholding", "Screws or clamps into the spoilboard", "Clamps or vise on the worktable", 1],
+  ["Workholding", "Composite brad nails (or clamps) into the spoilboard", "Clamps or vise on the worktable", 1],
   ["CAM", "Carbide Create (2D) · Fusion 360 (everything else)", "Fusion 360", 1],
   ["Runs from", "Carbide Motion", "Makera Controller", 1],
   ["Enclosure", "Open frame — stay clear, wear hearing protection", "Enclosed with window", 1],
@@ -1063,7 +1063,7 @@ function secPlan(opk) {
       m(xr, z, 0.6, "…and back past the other side of the part.");
       if (!last) m(xl, 12.3 * (k + 1) / n - 12.3 / n, 1.0, "…around again to where it started, ready to step down.", true);
     }
-    m(xr, SAFE, 0.6, S.tabs ? "Done — the part is cut free except for the tabs. 0.3 mm into the spoilboard makes a clean release." : "Done — the part is cut free. Without tabs it can shift on the last pass — use tabs or screws!");
+    m(xr, SAFE, 0.6, S.tabs ? "Done — the part is cut free except for the tabs. 0.3 mm into the spoilboard makes a clean release." : "Done — the part is cut free. Without tabs it can shift on the last pass — use tabs, or nail it down in the waste area!");
     sum = n + " passes × " + r2(12.3 / n) + " mm";
   } else if (opk === "pocket" || opk === "pocket2d") {
     var c = 32, n2 = Math.ceil(4 / ds);
@@ -1364,8 +1364,8 @@ function steps() {
       i: cc ? `Carbide Create: Simulate toolpaths in 3D view. Check depth and that nothing cuts where it shouldn’t.` : `Fusion: Simulate with stock, turn on collisions. Red = trouble.`, e: `Check the machining time — a 4-hour estimate on a beginner job usually means a settings mistake.` },
     { t: "Export", s: cc ? "Save G-code (.nc)" : (so ? "Post: Carbide 3D (Grbl)" : "Post: Makera Carvera"), b: `Save the toolpaths as a G-code file the machine can read.`,
       i: cc ? `Carbide Create: Save G-code. One file can hold all toolpaths and tool changes.` : `Fusion: Post Process with the ${so ? "Carbide 3D (Grbl)" : "Makera Carvera"} post.`, e: `Open the .nc in a text editor once — you’ll see the RPM (S), feeds (F) and tool changes (M6/T).` },
-    { t: "Hold & tool", s: so ? "Screw stock to spoilboard · install bit" : "Clamp stock · load tool + collar", b: `Clamp your material firmly and install the first tool.`,
-      i: so ? `Screw or clamp the stock to the spoilboard in waste areas (not into the aluminum frame). Tighten the ER-16 collet nut with the wrenches.` : `Insert the tool with its bit collar using the quick-change lever.`, e: `Keep clamps clear of every toolpath and below the retract height.` },
+    { t: "Hold & tool", s: so ? "Brad-nail stock to spoilboard · install bit" : "Clamp stock · load tool + collar", b: `Clamp your material firmly and install the first tool.`,
+      i: so ? `Brad-nail the stock to the spoilboard with composite nails in waste areas (or clamp it) — not into the aluminum frame. Tighten the ER-16 collet nut with the wrenches.` : `Insert the tool with its bit collar using the quick-change lever.`, e: `Keep clamps clear of every toolpath and below the retract height.` },
     { t: "Zero", s: so ? "Carbide Motion: BitZero / jog" : "Makera Controller: probe origin", b: `Show the machine where X0 Y0 Z0 is on your stock — same spot you chose in CAM.`,
       i: so ? `Use BitZero on the front-left corner, or jog and Zero All. BitSetter handles tool lengths.` : `Probe the corner and top, or set origin by jogging. Tool length is measured automatically.`, e: `Double-check Z0: stock top vs. spoilboard is the most common crash.` },
     { t: "Run & watch", s: so ? "Vacuum on · ear + eye protection" : "Door closed · stay nearby", b: `Start the job and stay with the machine the whole time. Know where Pause / Stop is.`,
@@ -1374,7 +1374,7 @@ function steps() {
 }
 var CHECKS = [
   ["Safety glasses on" + "", 1, "*"], ["Hearing protection (cutting is loud)", 1, "so"], ["Hair tied back; no loose sleeves, jewelry or gloves near the spindle", 1, "*"],
-  ["Stock screwed or clamped down; screws and clamps outside every toolpath", 1, "*"], ["Right tool installed; collet tight", 1, "*"],
+  ["Stock nailed or clamped down; nails and clamps outside every toolpath", 1, "*"], ["Right tool installed; collet tight", 1, "*"],
   ["X/Y/Z zero set at the same spot as in CAM", 1, "*"], ["Vacuum / dust boot on", 1, "so"], ["Door closed", 1, "ca"],
   ["I will stay with the machine the whole time", 1, "*"],
   ["Simulated in CAM; no collisions", 2, "*"], ["Retract / safe height clears clamps", 2, "*"], ["Tool numbers in the file match the tools I’ll load", 2, "*"], ["Feeds checked for this tool and material", 2, "*"],
@@ -1606,11 +1606,12 @@ var QUIZ = [
   ["Which machine cuts aluminum at REEF?", ["Carvera Air", "Shapeoko 5 Pro"], "Aluminum stays on the Carvera Air.", 1, ["machines", function () { S.mach = "ca"; }, '#stage [data-info="ca_stock"]']],
   ["Which endmill makes smooth, curved 3D surfaces?", ["Ball", "Flat", "V-bit"], "The round tip blends passes into a smooth surface.", 1, ["tools", function () { S.tool = "ball"; }, '#stage [data-info="em_groove"]']],
   ["What are tabs for?", ["Keeping the part attached so it can’t fly loose", "Making the cut faster", "Cooling the tool"], "Cut them off with a flush-cut saw and sand.", 1, ["paths", function () { S.sw = "cc"; S.op = "contour"; }, '#stage [data-info="tp_tab"]']],
-  ["Dashed blue lines in a toolpath are…", ["Rapids — the tool is lifted, moving fast", "Cuts", "Tabs"], "Make sure clamps and screws are below the safe height.", 1, ["paths", null, '#stage [data-info="tp_rapid"]']],
+  ["Dashed blue lines in a toolpath are…", ["Rapids — the tool is lifted, moving fast", "Cuts", "Tabs"], "Make sure clamps are below the safe height.", 1, ["paths", null, '#stage [data-info="tp_rapid"]']],
   ["Where is Z0 usually set?", ["Top of the stock", "Bottom of the spoilboard", "Tip of the spindle"], "It must match the origin you chose in CAM.", 1, ["paths", null, '#stage [data-info="tp_zero"]']],
-  ["Where do the screws go when you hold stock to the spoilboard?", ["In waste areas, outside every toolpath", "Anywhere is fine", "Inside the pocket"], "An endmill that hits a steel screw breaks.", 1, ["machines", function () { S.mach = "so"; }, '#stage [data-info="so_clamps"]']],
+  ["Where do the composite brad nails go when you hold stock to the spoilboard?", ["In waste areas, outside every toolpath", "Anywhere is fine", "Inside the pocket"], "Plastic nails won’t wreck a bit, but nails in a toolpath can pull a part loose or leave plastic in the cut.", 1, ["machines", function () { S.mach = "so"; }, '#stage [data-info="so_clamps"]']],
   ["Feed rate equals…", ["RPM × flutes × chipload", "RPM ÷ flutes", "Chipload × depth of cut"], "Change any one of those and the feed changes.", 2, ["feeds", null, '#rail [data-info="fs_feed"]']],
   ["Fine dust and a burning smell usually mean…", ["Rubbing — chipload is too small", "The feed is too high", "Everything is perfect"], "Raise feed or lower RPM to make real chips.", 2, ["feeds", null, "#rail section:last-child"]],
+  ["Why does REEF use composite (plastic) brad nails instead of steel ones on the Shapeoko?", ["If the endmill hits one, it cuts through instead of breaking the bit", "They hold harder than steel", "They’re magnetic"], "Steel nails, staples or screws in the cut can shatter an endmill.", 2, ["machines", function () { S.mach = "so"; }, '#stage [data-info="so_clamps"]']],
   ["Which program makes 3D toolpaths at REEF?", ["Fusion 360", "Carbide Create"], "Carbide Create is for 2D jobs on the Shapeoko.", 2, ["paths", function () { S.sw = "f"; }, '#rail [data-set="sw"]']],
   ["Adaptive clearing works best with…", ["Deep depth of cut, narrow width", "Shallow depth, full width", "Full depth, full width"], "Steady tool load — great for the 200 W Carvera Air.", 3, ["paths", function () { S.sw = "f"; S.op = "adaptive"; }, "#playBtn"]],
   ["A 90° V-bit cutting 2 mm deep makes a groove how wide?", ["4 mm", "2 mm", "1 mm"], "Width = 2 × depth × tan(45°) = 2 × depth.", 3, ["tools", function () { S.tool = "taper"; S.taper = 1; }, '#stage [data-info="em_groove"]']]
